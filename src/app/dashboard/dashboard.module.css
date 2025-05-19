@@ -1,0 +1,27 @@
+.logout {
+    width: 100% !important;
+    font-size: 1rem !important;
+    border-radius: 8px !important;
+    text-transform: none !important;
+    box-shadow: none !important;
+}
+
+@media screen and (max-width: 600px) {
+    .logout {
+        padding: 0.625rem !important;
+        font-size: 0.875rem !important;
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 960px) {
+    .logout {
+        padding: 0.6875rem !important;
+        font-size: 0.9375rem !important;
+    }
+}
+
+@media screen and (min-width: 961px) {
+    .logout {
+        padding: 0.75rem !important;
+    }
+}

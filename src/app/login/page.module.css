@@ -1,0 +1,148 @@
+.loginContainer {
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.paper {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 420px;
+    width: 520px;
+    padding: 2rem;
+}
+
+.loginForm {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 2rem;
+    gap: 1.5rem;
+}
+
+.inputLogin {
+    transition: all 0.3s ease;
+}
+
+.inputLogin:hover {
+    transform: translateX(4px);
+}
+
+.buttonLogin {
+    margin-top: 2.5em !important;
+    height: 48px !important;
+    font-size: 1.1rem !important;
+    text-transform: none !important;
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+    position: relative;
+    overflow: hidden !important;
+    background-color: #da177b !important;
+    color: white !important;
+}
+
+.buttonLogin:not(:disabled):hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.errorMessage {
+    color: #d32f2f;
+    font-size: 0.75rem;
+    margin-top: 3px;
+    margin-left: 14px;
+    min-height: 20px;
+    opacity: 0.9;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    margin-bottom: 0.5em;
+    position: relative;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .buttonLogin:not(:disabled):hover {
+        transform: scale(1.02);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .paper {
+        width: 90%;
+        min-height: 350px;
+        padding: 1.5rem;
+    }
+
+    .loginForm {
+        margin-top: 1.5rem;
+        gap: 1.25rem;
+    }
+}
+
+@media screen and (min-width: 601px) and (max-width: 960px) {
+    .paper {
+        width: 80%;
+        max-width: 500px;
+        min-height: 380px;
+        padding: 1.75rem;
+    }
+}
+
+@media screen and (min-width: 961px) {
+    .paper {
+        width: 520px;
+        min-height: 420px;
+        padding: 2.5rem;
+    }
+}
+
+@media screen and (max-height: 600px) {
+    .loginContainer {
+        padding: 1rem 0;
+    }
+
+    .paper {
+        margin: 1rem 0;
+        min-height: 350px;
+    }
+}
+
+@media screen and (max-width: 768px) and (orientation: landscape) {
+    .loginContainer {
+        padding: 1rem 0;
+    }
+    
+    .paper {
+        min-height: 300px;
+        margin: 1rem 0;
+    }
+
+    .loginForm {
+        margin-top: 1rem;
+        gap: 1rem;
+    }
+}
+
+@media print {
+    .loginContainer {
+        height: auto;
+    }
+
+    .paper {
+        box-shadow: none;
+        border: 1px solid #ddd;
+    }
+
+    .buttonLogin {
+        display: none;
+    }
+}
