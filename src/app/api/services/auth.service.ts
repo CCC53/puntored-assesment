@@ -1,10 +1,11 @@
 import { apiClient } from '../utils/apiClient';
-import { LoginCredentials, AuthResponse } from '../types/auth.types';
+import { LoginCredentials, AuthResponse } from '../../types/auth.types';
+import { ENDPOINTS } from '../config';
 
 export class AuthService {
     public static async login(credentials: LoginCredentials): Promise<AuthResponse> {
         try {
-            const response = await apiClient.post<AuthResponse>('/api/auth', credentials);
+            const response = await apiClient.post<AuthResponse>(ENDPOINTS.AUTH.LOGIN, credentials);
             if (response.data.token) {
                 localStorage.setItem('accessToken', response.data.token);
             }

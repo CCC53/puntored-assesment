@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Box, useTheme, TextField, InputAdornment, Button, Stack, Collapse } from "@mui/material";
 import { Search, Add, FilterList, TableRows } from "@mui/icons-material";
 import * as XLSX from 'xlsx';
-import { Filters, STATUS_MAP } from "../utils/types/components/components";
+import { Filters, STATUS_MAP } from "../types/components.types";
 import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "../components/LazyComponents";
 
 const data = {

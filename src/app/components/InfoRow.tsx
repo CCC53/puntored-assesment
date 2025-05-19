@@ -1,6 +1,6 @@
 'use client';
 import { Box, Typography } from '@mui/material';
-import { InfoRowProps } from "../utils/types/components/components";
+import { InfoRowProps } from "../types/components.types";
 
 export default function InfoRow({ label, children, alignTop = false }: InfoRowProps) {
     return (

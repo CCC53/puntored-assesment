@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Box, Typography, IconButton, Tooltip } from '@mui/material';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import CheckIcon from '@mui/icons-material/Check';
-import { CopyBlockProps } from '../utils/types/components/components';
+import { CopyBlockProps } from '../types/components.types';
 
 export default function CopyBlock({ text }: CopyBlockProps) {
   const [copied, setCopied] = useState(false);

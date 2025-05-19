@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography, Paper, useTheme, useMediaQuery, IconButton, Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { LazyChipStatus, LazyInfoRow } from "./LazyComponents";
-import { ModalInformationProps } from "../utils/types/components/components";
+import { ModalInformationProps } from "../types/components.types";
 
 export default function ModalInformation({ isOpen, onClose, row }: ModalInformationProps) {
     const theme = useTheme();

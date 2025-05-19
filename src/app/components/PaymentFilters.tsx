@@ -1,6 +1,6 @@
 import { Box, Paper, Stack, Typography, FormControl, InputLabel, Select, MenuItem, useTheme } from "@mui/material";
 import { DatePicker } from '@mui/x-date-pickers';
-import { PaymentFiltersProps, STATUS_OPTIONS } from "../utils/types/components/components";
+import { PaymentFiltersProps, STATUS_OPTIONS } from "../types/components.types";
 
 export default function PaymentFilters({ filters, onFilterChange }: PaymentFiltersProps) {
     const theme = useTheme();

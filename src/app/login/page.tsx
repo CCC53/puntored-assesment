@@ -7,7 +7,7 @@ import { useTheme } from '@mui/material';
 import dynamic from 'next/dynamic';
 import { AuthService } from '../api/services/auth.service';
 import { ErrorHandler } from '../api/utils/errorHandler';
-import { FormValues, FormErrors } from '../utils/types/form/form';
+import { FormValues, FormErrors } from '../types/form.types';
 import styles from './page.module.css';
 
 const TextField = dynamic(() => import('@mui/material/TextField'), { ssr: false });

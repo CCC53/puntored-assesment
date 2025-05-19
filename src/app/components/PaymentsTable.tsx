@@ -1,7 +1,7 @@
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableFooter, TablePagination, Paper, useTheme, useMediaQuery } from "@mui/material";
 import { Cancel, Preview } from "@mui/icons-material";
 import { LazyChipStatus } from "./LazyComponents";
-import { PaymentsTableProps } from "../utils/types/components/components";
+import { PaymentsTableProps } from "../types/components.types";
 
 export default function PaymentsTable({
     filteredRows,
