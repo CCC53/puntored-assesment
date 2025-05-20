@@ -1,4 +1,4 @@
-import { FieldConfig } from "../types/components/components";
+import { FieldConfig } from "@/app/types/components.types";
 
 export const paymentFields: FieldConfig[] = [
     {

@@ -16,6 +16,13 @@ export interface BasePaymentData {
     cancelDescription: string;
 }
 
+export interface PaymentRow extends BasePaymentData {
+    dueDate: string;
+    authorizationNumber: string;
+    paymentDate: string;
+    externalId: string;
+};
+
 export interface GeneratePaymentBody {
     externalId: string;
     amount: number;
@@ -40,9 +47,7 @@ export interface GeneratePaymentResponse {
 export interface GetPaymentResponse {
     responseCode: number;
     responseMessage: string;
-    data: BasePaymentData & {
-        dueDate: string;
-    }
+    data: PaymentRow;
 }
 
 export interface CancelPaymentBody {
@@ -69,12 +74,7 @@ export interface SearchPaymentsResponse {
     responseCode: number;
     responseMessage: string;
     data: {
-        content: (BasePaymentData & {
-            dueDate: string;
-            authorizationNumber: string;
-            paymentDate: string;
-            externalId: string;
-        })[];
+        content: PaymentRow[];
         page: {
             size: number;
             number: number;
@@ -83,10 +83,3 @@ export interface SearchPaymentsResponse {
         }
     }
 }
-
-export type PaymentRow = BasePaymentData & {
-    dueDate: string;
-    authorizationNumber: string;
-    paymentDate: string;
-    externalId: string;
-};

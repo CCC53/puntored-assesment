@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { LazyCopyBlock } from "./LazyComponents";
-import { DialogProps, FieldConfig } from "../types/components.types";
-import { cancelFields, paymentFields } from "../types/fields.types";
+import { DialogProps, FieldConfig } from "@/app/types/components.types";
+import { cancelFields, paymentFields } from "@/app/types/fields.types";
 
 export default function DynamicForm({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow }: DialogProps) {
     const fields = formType === 'payment' ? paymentFields : cancelFields;

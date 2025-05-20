@@ -1,12 +1,13 @@
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableFooter, TablePagination, Paper, useTheme, useMediaQuery, Box, Typography } from '@mui/material';
 import { Cancel, Info, Preview } from "@mui/icons-material";
 import { LazyChipStatus } from "./LazyComponents";
-import { PaymentsTableProps } from "../types/components.types";
+import { PaymentsTableProps } from "@/app/types/components.types";
 
 export default function PaymentsTable({
     data,
     page,
     rowsPerPage,
+    totalItems,
     onPageChange,
     onRowsPerPageChange,
     onCancelClick,
@@ -100,14 +101,14 @@ export default function PaymentsTable({
                                     <TablePagination
                                         rowsPerPageOptions={[10, 50, 100]}
                                         colSpan={7}
-                                        count={-1}
+                                        count={totalItems}
                                         rowsPerPage={rowsPerPage}
                                         page={page}
                                         onPageChange={onPageChange}
                                         onRowsPerPageChange={onRowsPerPageChange}
                                         labelRowsPerPage="Elementos por página"
                                         labelDisplayedRows={({ from, to, count, page }) =>
-                                            `Página ${page + 1}`
+                                            `Página ${page + 1} de ${Math.ceil(count / rowsPerPage)}`
                                         }
                                         sx={{
                                             '.MuiTablePagination-selectLabel, .MuiTablePagination-select, .MuiTablePagination-displayedRows': {

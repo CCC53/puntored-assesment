@@ -6,7 +6,6 @@ import { CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 import dynamic from 'next/dynamic';
 
-// Lazy load Material-UI components
 const Button = dynamic(() => import('@mui/material/Button'), { ssr: false });
 const Typography = dynamic(() => import('@mui/material/Typography'), { ssr: false });
 const Container = dynamic(() => import('@mui/material/Container'), { ssr: false });
@@ -17,7 +16,7 @@ const LoadingFallback = () => (
     </Box>
 );
 
-export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function Error({ error }: { error: Error & { digest?: string } }) {
     useEffect(() => {
         console.error(error);
     }, [error]);

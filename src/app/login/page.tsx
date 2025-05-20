@@ -9,6 +9,7 @@ import { AuthService } from '../api/services/auth.service';
 import { ErrorHandler } from '../api/utils/errorHandler';
 import { FormValues, FormErrors } from '../types/form.types';
 import styles from './page.module.css';
+import { AxiosError } from 'axios';
 
 const TextField = dynamic(() => import('@mui/material/TextField'), { ssr: false });
 const Button = dynamic(() => import('@mui/material/Button'), { ssr: false });
@@ -106,9 +107,10 @@ export default function Login() {
         event.preventDefault();
         try {
             const response = await AuthService.login({ username: values.username, password: values.password });
+            console.log(response)
             window.location.href = '/dashboard';
         } catch (error) {
-            const apiError = ErrorHandler.handle(error as any);
+            const apiError = ErrorHandler.handle(error as AxiosError);
             setErrors(prev => ({
                 ...prev,
                 general: apiError.message

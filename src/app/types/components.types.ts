@@ -1,9 +1,10 @@
 import { ReactNode } from "react";
-import { PaymentRow } from "./payments.types";
+import { PaymentRow, ValidPaymentStatus } from "./payments.types";
 
 export interface PaymentFiltersProps {
     filters: Filters;
-    onFilterChange: (field: keyof Filters) => (value: any) => void;
+    type: 'table' | 'stats';
+    onFilterChange: <T extends keyof Filters>(field: T) => (value: Filters[T]) => void;
 }
 
 export interface ChipStatusProps {
@@ -34,11 +35,7 @@ export interface DialogProps {
     formType?: 'payment' | 'cancel';
     onClose?: () => void;
     onSubmit?: (data: Record<string, any>) => Promise<void>;
-    selectedRow?: any;
-}
-
-export interface TableProps {
-    rows: any[]
+    selectedRow: PaymentRow | null;
 }
 
 export interface Filters {
@@ -67,7 +64,7 @@ export const STATUS_OPTIONS = [
 export interface ModalInformationProps {
     isOpen: boolean;
     onClose?: () => void;
-    row: any;
+    row: PaymentRow;
 }
 
 
@@ -78,12 +75,16 @@ export interface PaymentsTableProps {
     totalItems: number;
     onPageChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-    onCancelClick: (row: any) => void;
-    onViewDetails: (row: any) => void;
+    onCancelClick: (row: PaymentRow) => void;
+    onViewDetails: (row: PaymentRow) => void;
 }
 
 export interface InfoRowProps {
     label: string;
     children: ReactNode;
     alignTop?: boolean;
+}
+
+export interface PaymentStatsChartProps {
+    stats: Record<string, number>;
 }

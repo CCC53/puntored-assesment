@@ -1,5 +1,5 @@
 import { Chip, ChipProps } from "@mui/material";
-import { ChipStatusProps } from "../types/components.types";
+import { ChipStatusProps } from "@/app/types/components.types";
 
 export default function ChipStatus({ value }: ChipStatusProps) {
     const statusMap: Record<string, { label: string; color: ChipProps['color'] }> = {

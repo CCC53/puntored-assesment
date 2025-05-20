@@ -1,19 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Box, useTheme, TextField, InputAdornment, Button, Stack, Collapse, CircularProgress, Typography } from "@mui/material";
-import { Search, Add, FilterList, TableRows } from "@mui/icons-material";
-import * as XLSX from 'xlsx';
-import { Filters, STATUS_MAP } from "@/app/types/components.types";
-import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "@/app/components/LazyComponents";
 import { useDispatch, useSelector } from "react-redux";
-import { searchPayments, setPage, setPageSize, setSelectedPayment } from "@/app/redux/payments.slice";
-import { RootState } from "@/app/redux/store";
-import { PaymentRow } from "@/app/types/payments.types";
+import { FilterList } from "@mui/icons-material";
+import { Box, Button, Stack, Collapse } from "@mui/material";
+import { Filters } from "@/app/types/components.types";
+import { LazyPaymentFilters, LazyPaymentStatsChart } from "@/app/components/LazyComponents";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { countPaymentsForStats } from "@/app/redux/payments.slice";
 
 export default function Dashboard() {
-    const dispatch = useDispatch();
-    const { payments, pageSize, loading, error, currentPage, selectedPayment, totalElements } = useSelector((state: RootState) => state.payments);
-
+    const dispatch = useDispatch<AppDispatch>();
+    const { totalPayments } = useSelector((state: RootState) => state.payments);
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState<Filters>({
         startCreationDate: null,
@@ -22,27 +19,20 @@ export default function Dashboard() {
         endPaymentDate: null,
         status: ''
     });
-    
-    const theme = useTheme();
 
     const hasValidFilters = (filters: Filters): boolean => {
         const hasValidDateRange = (
             (filters.startCreationDate !== null && filters.endCreationDate !== null) ||
             (filters.startPaymentDate !== null && filters.endPaymentDate !== null)
         );
-        
-        const hasValidStatus = filters.status !== '';
-        
-        return hasValidDateRange && hasValidStatus;
+        return hasValidDateRange;
     };
 
     useEffect(() => {
         if (hasValidFilters(filters)) {
-            // @ts-ignore - Known issue with Redux Toolkit types
-            dispatch(searchPayments(filters));
+            dispatch(countPaymentsForStats(filters));
         }
-    }, [dispatch, filters]);
-
+    }, [filters]);
 
     const handleFilterChange = (field: keyof Filters) => (value: any) => {
         let processedValue = value;
@@ -57,24 +47,7 @@ export default function Dashboard() {
             ...prev,
             [field]: processedValue
         }));
-        dispatch(setPage(0));
     };
-
-    if (loading) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <CircularProgress />
-            </Box>
-        );
-    }
-
-    if (error) {
-        return (
-            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-                <Typography color="error">Error: {error}</Typography>
-            </Box>
-        );
-    }
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -106,11 +79,13 @@ export default function Dashboard() {
             </Stack>
 
             <Collapse in={showFilters}>
-                <LazyPaymentFilters 
+                <LazyPaymentFilters
                     filters={filters}
                     onFilterChange={handleFilterChange}
+                    type="stats"
                 />
             </Collapse>
+            {hasValidFilters(filters) && <LazyPaymentStatsChart stats={totalPayments} />}
         </Box>
     );
 }

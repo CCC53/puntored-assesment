@@ -9,13 +9,11 @@ import { AuthService } from '../api/services/auth.service';
 import { CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 
-// Lazy load icons
 const MenuIcon = dynamic(() => import('@mui/icons-material/Menu'), { ssr: false });
 const DashboardIcon = dynamic(() => import('@mui/icons-material/Dashboard'), { ssr: false });
 const BarChartIcon = dynamic(() => import('@mui/icons-material/BarChart'), { ssr: false });
 const LogoutIcon = dynamic(() => import('@mui/icons-material/Logout'), { ssr: false });
 
-// Lazy load Material-UI components
 const AppBar = dynamic(() => import('@mui/material/AppBar'), { ssr: false });
 const Drawer = dynamic(() => import('@mui/material/Drawer'), { ssr: false });
 const IconButton = dynamic(() => import('@mui/material/IconButton'), { ssr: false });
@@ -166,13 +164,14 @@ export default function DashboardLayout({
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    padding: theme.spacing(3),
+                    padding: theme.spacing(6),
                     transition: theme.transitions.create(['margin', 'width'], {
                         easing: theme.transitions.easing.sharp,
                         duration: theme.transitions.duration.leavingScreen,
                     }),
                     marginLeft: 0,
                     width: '100%',
+                    marginBottom: '150px',
                     ...(open && {
                         width: `calc(100% - ${drawerWidth}px)`,
                         marginLeft: `${drawerWidth}px`,
@@ -190,8 +189,8 @@ export default function DashboardLayout({
                 <Box
                     sx={{
                         mt: 'auto',
-                        py: 3,
-                        px: 2,
+                        py: 6,
+                        px: 6,
                         backgroundColor: 'white',
                         borderTop: '1px solid rgba(0, 0, 0, 0.12)',
                         position: 'fixed',
@@ -202,7 +201,7 @@ export default function DashboardLayout({
                         flexDirection: { xs: 'column', sm: 'row' },
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        gap: 2,
+                        gap: 4,
                         role: 'contentinfo'
                     }}
                 >

@@ -3,15 +3,15 @@ import { useEffect, useState } from "react";
 import { Box, useTheme, TextField, InputAdornment, Button, Stack, Collapse, CircularProgress, Typography } from "@mui/material";
 import { Search, Add, FilterList, TableRows } from "@mui/icons-material";
 import * as XLSX from 'xlsx';
-import { Filters, STATUS_MAP } from "../types/components.types";
-import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "../components/LazyComponents";
+import { Filters, STATUS_MAP } from "@/app/types/components.types";
+import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "@/app/components/LazyComponents";
 import { useDispatch, useSelector } from "react-redux";
-import { searchPayments, setPage, setPageSize, setSelectedPayment } from "../redux/payments.slice";
-import { RootState } from "../redux/store";
-import { PaymentRow } from "../types/payments.types";
+import { searchPayments, setPage, setPageSize, setSelectedPayment } from "@/app/redux/payments.slice";
+import { AppDispatch, RootState } from "@/app/redux/store";
+import { PaymentRow } from "@/app/types/payments.types";
 
 export default function Dashboard() {
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
     const { payments, pageSize, loading, error, currentPage, selectedPayment, totalElements } = useSelector((state: RootState) => state.payments);
 
     const [openModal, setOpenModal] = useState(false);
@@ -26,7 +26,7 @@ export default function Dashboard() {
         endPaymentDate: null,
         status: ''
     });
-    
+
     const theme = useTheme();
 
     const hasValidFilters = (filters: Filters): boolean => {
@@ -34,9 +34,9 @@ export default function Dashboard() {
             (filters.startCreationDate !== null && filters.endCreationDate !== null) ||
             (filters.startPaymentDate !== null && filters.endPaymentDate !== null)
         );
-        
+
         const hasValidStatus = filters.status !== '';
-        
+
         return hasValidDateRange && hasValidStatus;
     };
 
@@ -187,7 +187,8 @@ export default function Dashboard() {
             </Stack>
 
             <Collapse in={showFilters}>
-                <LazyPaymentFilters 
+                <LazyPaymentFilters
+                    type="table"
                     filters={filters}
                     onFilterChange={handleFilterChange}
                 />
@@ -214,6 +215,7 @@ export default function Dashboard() {
             />
 
             <LazyDynamicForm
+                selectedRow={null}
                 isOpen={openPaymentForm}
                 formType="payment"
                 onClose={() => setOpenPaymentForm(false)}
@@ -228,11 +230,13 @@ export default function Dashboard() {
                 selectedRow={selectedPayment}
             />
 
-            <LazyModalInformation 
-                isOpen={openModal} 
-                onClose={() => setOpenModal(false)} 
-                row={selectedPayment} 
-            />
+            {
+                selectedPayment && <LazyModalInformation
+                    isOpen={openModal}
+                    onClose={() => setOpenModal(false)}
+                    row={selectedPayment}
+                />
+            }
         </Box>
     );
 }

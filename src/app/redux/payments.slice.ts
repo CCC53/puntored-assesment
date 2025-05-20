@@ -11,20 +11,27 @@ const initialState: StoreData = {
     totalElements: 0,
     totalPages: 0,
     currentPage: 0,
-    pageSize: 10
+    pageSize: 10,
+    totalPayments: {}
 }
 
-export const searchPayments = createAsyncThunk(
-    'payments/searchPayments',
-    async (filters: Filters, { rejectWithValue }) => {
-        try {
-            const response = await PaymentsService.searchPayments(filters);
-            return response;
-        } catch (error) {
-            return rejectWithValue(error);
-        }
+export const searchPayments = createAsyncThunk('payments/searchPayments', async (filters: Filters, { rejectWithValue }) => {
+    try {
+        const response = await PaymentsService.searchPayments(filters);
+        return response;
+    } catch (error) {
+        return rejectWithValue(error);
     }
-);
+});
+
+export const countPaymentsForStats = createAsyncThunk('payments/countPaymentsForStats', async (filters: Filters, { rejectWithValue }) => {
+    try {
+        const response = await PaymentsService.countPaymentsForStats(filters);
+        return response;
+    } catch (error) {
+        return rejectWithValue(error);
+    }
+})
 
 export const paymentSlice = createSlice({
     name: 'payments',
@@ -51,7 +58,7 @@ export const paymentSlice = createSlice({
             })
             .addCase(searchPayments.fulfilled, (state, action) => {
                 state.loading = false;
-                if (action.payload) {                    
+                if (action.payload) {
                     state.payments = action.payload.data.content;
                     state.totalElements = action.payload.data.page.totalElements;
                     state.totalPages = action.payload.data.page.totalPages;
@@ -62,7 +69,21 @@ export const paymentSlice = createSlice({
             .addCase(searchPayments.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
-            });
+            })
+            .addCase(countPaymentsForStats.pending, state => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(countPaymentsForStats.fulfilled, (state, action) => {
+                state.loading = false;
+                if (action.payload) {
+                    state.totalPayments = action.payload;
+                }
+            })
+            .addCase(countPaymentsForStats.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
     }
 });
 

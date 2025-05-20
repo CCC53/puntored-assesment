@@ -1,10 +1,10 @@
-import { Box, Paper, Stack, Typography, FormControl, InputLabel, Select, MenuItem, useTheme } from "@mui/material";
-import { DatePicker } from '@mui/x-date-pickers';
-import { PaymentFiltersProps, STATUS_OPTIONS } from "../types/components.types";
-import { differenceInDays } from 'date-fns';
 import { useState } from 'react';
+import { DatePicker } from '@mui/x-date-pickers';
+import { differenceInDays } from 'date-fns';
+import { Box, Paper, Stack, Typography, FormControl, InputLabel, Select, MenuItem, useTheme } from "@mui/material";
+import { PaymentFiltersProps, STATUS_OPTIONS } from "@/app/types/components.types";
 
-export default function PaymentFilters({ filters, onFilterChange }: PaymentFiltersProps) {
+export default function PaymentFilters({ filters, onFilterChange, type }: PaymentFiltersProps) {
     const theme = useTheme();
     const [dateErrors, setDateErrors] = useState({
         startCreationDate: '',
@@ -67,7 +67,10 @@ export default function PaymentFilters({ filters, onFilterChange }: PaymentFilte
                 Filtros Avanzados
             </Typography>
             <Typography variant="body2" sx={{ mb: 3, color: theme.palette.text.secondary }}>
-                * Se requiere completar al menos un rango de fechas (creación o pago) y seleccionar un status
+                {
+                    type === 'table' ? '* Se requiere completar al menos un rango de fechas (creación o pago) y seleccionar un status' :
+                        '* Se requiere completar al menos un rango de fechas (creación o pago)'
+                }
             </Typography>
             <Stack
                 direction={{ xs: 'column', sm: 'row' }}
@@ -140,24 +143,28 @@ export default function PaymentFilters({ filters, onFilterChange }: PaymentFilte
                         }}
                     />
                 </Box>
-                <Box sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
-                    <FormControl fullWidth size="small" error={!filters.status}>
-                        <InputLabel id="status-select-label" required>Status</InputLabel>
-                        <Select
-                            labelId="status-select-label"
-                            value={filters.status}
-                            label="Estatus del pago"
-                            onChange={(e) => onFilterChange('status')(e.target.value)}
-                            required
-                        >
-                            {STATUS_OPTIONS.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </Box>
+                {
+                    type === 'table' && (
+                        <Box sx={{ width: { xs: '100%', sm: '48%', md: '23%' } }}>
+                            <FormControl fullWidth size="small" error={!filters.status}>
+                                <InputLabel id="status-select-label" required>Status</InputLabel>
+                                <Select
+                                    labelId="status-select-label"
+                                    value={filters.status}
+                                    label="Estatus del pago"
+                                    onChange={(e) => onFilterChange('status')(e.target.value)}
+                                    required
+                                >
+                                    {STATUS_OPTIONS.map((option) => (
+                                        <MenuItem key={option.value} value={option.value}>
+                                            {option.label}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
+                    )
+                }
             </Stack>
         </Paper>
     );
