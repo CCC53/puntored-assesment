@@ -5,7 +5,7 @@ import { LazyCopyBlock } from "./LazyComponents";
 import { DialogProps, FieldConfig } from "@/app/types/components.types";
 import { cancelFields, paymentFields } from "@/app/types/fields.types";
 
-export default function DynamicForm({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow }: DialogProps) {
+export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow }: DialogProps<T>) {
     const fields = formType === 'payment' ? paymentFields : cancelFields;
 
     const [formState, setFormState] = useState<{ values: Record<string, any>; errors: Record<string, string>; touched: Record<string, boolean>; }>({
@@ -28,7 +28,7 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
         });
     };
 
-    const validateField = (field: FieldConfig, value: any): string => {
+    function validateField<T>(field: FieldConfig<T>, value: T) {
         if (field.required && !value) {
             return `${field.label} es requerido`;
         }
@@ -36,17 +36,14 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
             return field.validation(value);
         }
         return '';
-    };
+    }
 
-    const handleChange = (field: FieldConfig) => (
-        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | null,
-        dateValue?: Date | null
-    ) => {
+    function handleChange<T>(field: FieldConfig<T>, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | null, dateValue?: Date | null) {
         const value = field.type === 'date' ? dateValue : event?.target.value;
 
         setFormState(prev => {
             const newValues = { ...prev.values, [field.name]: value };
-            const error = prev.touched[field.name] ? validateField(field, value) : '';
+            const error = prev.touched[field.name] ? validateField(field, value as T) : '';
 
             return {
                 ...prev,
@@ -54,9 +51,9 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 errors: { ...prev.errors, [field.name]: error }
             };
         });
-    };
+    }
 
-    const handleBlur = (field: FieldConfig) => () => {
+    function handleBlur<T>(field: FieldConfig<T>) {
         setFormState(prev => ({
             ...prev,
             touched: { ...prev.touched, [field.name]: true },
@@ -65,7 +62,7 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 [field.name]: validateField(field, prev.values[field.name])
             }
         }));
-    };
+    }
 
     const isFormValid = () => {
         const allErrors = fields.map(field => validateField(field, formState.values[field.name]));
@@ -88,15 +85,15 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
         }
     };
 
-    const renderField = (field: FieldConfig) => {
+    function renderField<T>(field: FieldConfig<T>) {
         if (field.type === 'date') {
             return (
                 <DatePicker
                     key={field.name}
                     label={field.label}
                     value={formState.values[field.name]}
-                    onChange={(newValue) => handleChange(field)(null, newValue)}
-                    onClose={() => handleBlur(field)()}
+                    onChange={(newValue) => handleChange(field, null, newValue)}
+                    onClose={() => handleBlur(field)}
                     slotProps={{
                         textField: {
                             required: field.required,
@@ -107,7 +104,6 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 />
             );
         }
-
         return (
             <TextField
                 key={field.name}
@@ -117,8 +113,8 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 type={field.type === 'disabled' ? 'text' : field.type}
                 placeholder={field.placeholder}
                 value={formState.values[field.name]}
-                onChange={handleChange(field)}
-                onBlur={handleBlur(field)}
+                onChange={() => handleChange(field, null)}
+                onBlur={() => handleBlur(field)}
                 error={formState.touched[field.name] && Boolean(formState.errors[field.name])}
                 helperText={formState.touched[field.name] && formState.errors[field.name]}
                 disabled={field.type === 'disabled'}
@@ -129,7 +125,7 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 }}
             />
         );
-    };
+    }
 
     useEffect(() => {
         if (!isOpen) {

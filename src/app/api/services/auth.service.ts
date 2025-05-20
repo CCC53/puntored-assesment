@@ -1,6 +1,7 @@
 import { apiClient } from '../utils/apiClient';
 import { LoginCredentials, AuthResponse } from '../../types/auth.types';
 import { ENDPOINTS } from '../config';
+import { AxiosError } from 'axios';
 
 export class AuthService {
     public static async login(credentials: LoginCredentials): Promise<AuthResponse> {
@@ -11,7 +12,7 @@ export class AuthService {
             }
             return response;
         } catch (error) {
-            this.handleAuthError(error);
+            this.handleAuthError(error as AxiosError);
             throw error;
         }
     }
@@ -24,7 +25,7 @@ export class AuthService {
         localStorage.removeItem('accessToken');
     }
 
-    private static handleAuthError(error: any): void {
+    private static handleAuthError(error: AxiosError): void {
         if (error.response?.status === 401) {
             this.clearAuthData();
             window.location.href = '/login';

@@ -107,7 +107,7 @@ export default function PaymentsTable({
                                         onPageChange={onPageChange}
                                         onRowsPerPageChange={onRowsPerPageChange}
                                         labelRowsPerPage="Elementos por página"
-                                        labelDisplayedRows={({ from, to, count, page }) =>
+                                        labelDisplayedRows={({ count, page }) =>
                                             `Página ${page + 1} de ${Math.ceil(count / rowsPerPage)}`
                                         }
                                         sx={{

@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { PaymentRow, ValidPaymentStatus } from "./payments.types";
+import { PaymentRow } from "./payments.types";
 
 export interface PaymentFiltersProps {
     filters: Filters;
@@ -15,13 +15,13 @@ export interface CopyBlockProps {
   text: string;
 }
 
-export interface FieldConfig {
+export interface FieldConfig<T> {
     name: string;
     label: string;
     type: 'text' | 'number' | 'date' | 'disabled';
     placeholder?: string;
     required?: boolean;
-    validation?: (value: any) => string;
+    validation?: (value: T) => string;
     startAdornment?: string;
     min?: number;
     max?: number;
@@ -30,11 +30,11 @@ export interface FieldConfig {
     value?: string;
 }
 
-export interface DialogProps {
+export interface DialogProps<T> {
     isOpen: boolean;
     formType?: 'payment' | 'cancel';
     onClose?: () => void;
-    onSubmit?: (data: Record<string, any>) => Promise<void>;
+    onSubmit?: (data: Record<string, T>) => Promise<void>;
     selectedRow: PaymentRow | null;
 }
 

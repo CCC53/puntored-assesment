@@ -42,7 +42,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (hasValidFilters(filters)) {
-            // @ts-ignore - Known issue with Redux Toolkit types
+            // @ts-expect-error
             dispatch(searchPayments(filters));
         }
     }, [dispatch, filters]);

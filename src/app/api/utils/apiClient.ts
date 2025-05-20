@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosInstance, AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios';
 import { API_CONFIG } from '../config';
 
 class ApiClient {
@@ -53,13 +53,13 @@ class ApiClient {
         return response.data;
     }
 
-    public async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.post<T>(url, data, config);
+    public async post<T, D = unknown>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<T> {
+        const response = await this.axiosInstance.post<T, AxiosResponse<T>, D>(url, data, config);
         return response.data;
     }
 
-    public async put<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        const response = await this.axiosInstance.put<T>(url, data, config);
+    public async put<T, D = unknown>(url: string,data?: D,config?: AxiosRequestConfig<D>): Promise<T> {
+        const response = await this.axiosInstance.put<T, AxiosResponse<T>, D>(url, data, config);
         return response.data;
     }
 }
