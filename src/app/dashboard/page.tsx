@@ -42,28 +42,27 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (hasValidFilters(filters)) {
-            // @ts-expect-error
             dispatch(searchPayments(filters));
         }
     }, [dispatch, filters]);
 
-    const handlePaymentSubmit = async (data: Record<string, any>) => {
+    async function handlePaymentSubmit<T>(data: Record<string, T>) {
         console.log('Payment form data:', data);
         setOpenPaymentForm(false);
-    };
+    }
 
-    const handleCancelSubmit = async (data: Record<string, any>) => {
+    async function handleCancelSubmit<T>(data: Record<string, T>) {
         console.log('Cancel form data:', data);
         setOpenCancelForm(false);
-    };
+    }
 
-    const handleFilterChange = (field: keyof Filters) => (value: any) => {
+    const handleFilterChange = <K extends keyof Filters>(field: K) => (value: Filters[K]) => {
         let processedValue = value;
         if (field === 'endCreationDate' || field === 'endPaymentDate') {
             if (value) {
                 const date = new Date(value);
                 date.setHours(23, 59, 0, 0);
-                processedValue = date;
+                processedValue = date as Filters[K];
             }
         }
         setFilters(prev => ({

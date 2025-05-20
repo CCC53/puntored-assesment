@@ -39,8 +39,7 @@ export class PaymentsService {
     public static async searchPayments(filters: Filters) {
         try {
             const concatedFilters = Object.entries(filters).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
-            // const response = await apiClient.get<SearchPaymentsResponse>(`${ENDPOINTS.REFERENCES.SEARCH}?${concatedFilters}`);
-            const response = await apiClient.get<SearchPaymentsResponse>(`/1b7d-e4c9-45e1-9972`);
+            const response = await apiClient.get<SearchPaymentsResponse>(`${ENDPOINTS.REFERENCES.SEARCH}?${concatedFilters}`);
             return response;
         } catch (error) {
             console.log(error);

@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import { LazyCopyBlock } from "./LazyComponents";
 import { DialogProps, FieldConfig } from "@/app/types/components.types";
 import { cancelFields, paymentFields } from "@/app/types/fields.types";
 
@@ -78,6 +77,7 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
             }
             if (onClose) onClose();
         } catch (error) {
+            console.log(error);
             setFormState(prev => ({
                 ...prev,
                 errors: { ...prev.errors, general: 'Error al procesar la solicitud. Por favor, intente nuevamente.' }
@@ -131,7 +131,7 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
         if (!isOpen) {
             resetForm();
         }
-    }, [isOpen]);
+    }, [isOpen, resetForm]);
 
     useEffect(() => {
         if (isOpen && formType === 'cancel' && selectedRow?.reference) {

@@ -32,15 +32,15 @@ export default function Dashboard() {
         if (hasValidFilters(filters)) {
             dispatch(countPaymentsForStats(filters));
         }
-    }, [filters]);
+    }, [filters, dispatch]);
 
-    const handleFilterChange = (field: keyof Filters) => (value: any) => {
+    const handleFilterChange = <K extends keyof Filters>(field: K) => (value: Filters[K]) => {
         let processedValue = value;
         if (field === 'endCreationDate' || field === 'endPaymentDate') {
             if (value) {
                 const date = new Date(value);
                 date.setHours(23, 59, 0, 0);
-                processedValue = date;
+                processedValue = date as Filters[K];
             }
         }
         setFilters(prev => ({
