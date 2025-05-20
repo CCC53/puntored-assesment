@@ -75,5 +75,18 @@ export interface SearchPaymentsResponse {
             paymentDate: string;
             externalId: string;
         })[];
+        page: {
+            size: number;
+            number: number;
+            totalElements: number;
+            totalPages: number;
+        }
     }
 }
+
+export type PaymentRow = BasePaymentData & {
+    dueDate: string;
+    authorizationNumber: string;
+    paymentDate: string;
+    externalId: string;
+};

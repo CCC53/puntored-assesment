@@ -33,24 +33,6 @@
     transform: translateX(4px);
 }
 
-.buttonLogin {
-    margin-top: 2.5em !important;
-    height: 48px !important;
-    font-size: 1.1rem !important;
-    text-transform: none !important;
-    border-radius: 8px !important;
-    transition: all 0.3s ease !important;
-    position: relative;
-    overflow: hidden !important;
-    background-color: #da177b !important;
-    color: white !important;
-}
-
-.buttonLogin:not(:disabled):hover {
-    transform: scale(1.02);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
 .errorMessage {
     color: #d32f2f;
     font-size: 0.75rem;
@@ -66,13 +48,6 @@
     width: 100%;
     margin-bottom: 0.5em;
     position: relative;
-}
-
-@media (hover: hover) and (pointer: fine) {
-    .buttonLogin:not(:disabled):hover {
-        transform: scale(1.02);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
 }
 
 @media screen and (max-width: 600px) {
@@ -136,13 +111,8 @@
     .loginContainer {
         height: auto;
     }
-
     .paper {
         box-shadow: none;
         border: 1px solid #ddd;
-    }
-
-    .buttonLogin {
-        display: none;
     }
 }

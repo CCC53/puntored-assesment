@@ -202,7 +202,6 @@ export default function Login() {
                             </Box>
                         )}
                         <Button
-                            className={styles.buttonLogin}
                             variant="contained"
                             type="submit"
                             disabled={!isFormValid()}

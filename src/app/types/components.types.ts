@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { PaymentRow } from "./payments.types";
 
 export interface PaymentFiltersProps {
     filters: Filters;
@@ -71,9 +72,10 @@ export interface ModalInformationProps {
 
 
 export interface PaymentsTableProps {
-    filteredRows: any[];
+    data: PaymentRow[];
     page: number;
     rowsPerPage: number;
+    totalItems: number;
     onPageChange: (event: React.MouseEvent<HTMLButtonElement> | null, newPage: number) => void;
     onRowsPerPageChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
     onCancelClick: (row: any) => void;

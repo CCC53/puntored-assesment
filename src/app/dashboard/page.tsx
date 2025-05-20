@@ -1,45 +1,22 @@
 "use client";
-import { useState } from "react";
-import { Box, useTheme, TextField, InputAdornment, Button, Stack, Collapse } from "@mui/material";
+import { useEffect, useState } from "react";
+import { Box, useTheme, TextField, InputAdornment, Button, Stack, Collapse, CircularProgress, Typography } from "@mui/material";
 import { Search, Add, FilterList, TableRows } from "@mui/icons-material";
 import * as XLSX from 'xlsx';
 import { Filters, STATUS_MAP } from "../types/components.types";
 import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "../components/LazyComponents";
-
-const data = {
-    "responseCode": 200,
-    "responseMessage": "Payments retrieved successfully",
-    "data": {
-        "content": [
-            {
-                "paymentId": 622,
-                "amount": 100.0,
-                "reference": "PRV1250518EB481C8B53C6A05D4C48",
-                "description": "Payment description",
-                "dueDate": "2025-05-30 11:59:00",
-                "status": "01",
-                "callBackURL": "https://localhost:8080/callback",
-                "callbackACKID": "",
-                "cancelDescription": "",
-                "externalId": "12332"
-            }
-        ],
-        "page": {
-            "size": 10,
-            "number": 0,
-            "totalElements": 1,
-            "totalPages": 1
-        }
-    }
-};
+import { useDispatch, useSelector } from "react-redux";
+import { searchPayments, setPage, setPageSize, setSelectedPayment } from "../redux/payments.slice";
+import { RootState } from "../redux/store";
+import { PaymentRow } from "../types/payments.types";
 
 export default function Dashboard() {
-    const [page, setPage] = useState(data.data.page.number);
+    const dispatch = useDispatch();
+    const { payments, pageSize, loading, error, currentPage, selectedPayment, totalElements } = useSelector((state: RootState) => state.payments);
+
     const [openModal, setOpenModal] = useState(false);
     const [openPaymentForm, setOpenPaymentForm] = useState(false);
     const [openCancelForm, setOpenCancelForm] = useState(false);
-    const [selectedRow, setSelectedRow] = useState(null);
-    const [rowsPerPage, setRowsPerPage] = useState(data.data.page.size);
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
     const [filters, setFilters] = useState<Filters>({
@@ -52,6 +29,24 @@ export default function Dashboard() {
     
     const theme = useTheme();
 
+    const hasValidFilters = (filters: Filters): boolean => {
+        const hasValidDateRange = (
+            (filters.startCreationDate !== null && filters.endCreationDate !== null) ||
+            (filters.startPaymentDate !== null && filters.endPaymentDate !== null)
+        );
+        
+        const hasValidStatus = filters.status !== '';
+        
+        return hasValidDateRange && hasValidStatus;
+    };
+
+    useEffect(() => {
+        if (hasValidFilters(filters)) {
+            // @ts-ignore - Known issue with Redux Toolkit types
+            dispatch(searchPayments(filters));
+        }
+    }, [dispatch, filters]);
+
     const handlePaymentSubmit = async (data: Record<string, any>) => {
         console.log('Payment form data:', data);
         setOpenPaymentForm(false);
@@ -63,30 +58,23 @@ export default function Dashboard() {
     };
 
     const handleFilterChange = (field: keyof Filters) => (value: any) => {
+        let processedValue = value;
+        if (field === 'endCreationDate' || field === 'endPaymentDate') {
+            if (value) {
+                const date = new Date(value);
+                date.setHours(23, 59, 0, 0);
+                processedValue = date;
+            }
+        }
         setFilters(prev => ({
             ...prev,
-            [field]: value
+            [field]: processedValue
         }));
-        setPage(0);
+        dispatch(setPage(0));
     };
 
-    const filteredRows = data.data.content.filter((row: any) => {
-        const matchesSearch = Object.values(row).some((value: any) =>
-            value?.toString().toLowerCase().includes(searchQuery.toLowerCase())
-        );
-
-        const matchesFilters =
-            (!filters.startCreationDate || new Date(row.dueDate) >= filters.startCreationDate) &&
-            (!filters.endCreationDate || new Date(row.dueDate) <= filters.endCreationDate) &&
-            (!filters.startPaymentDate || new Date(row.dueDate) >= filters.startPaymentDate) &&
-            (!filters.endPaymentDate || new Date(row.dueDate) <= filters.endPaymentDate) &&
-            (!filters.status || row.status === filters.status);
-
-        return matchesSearch && matchesFilters;
-    });
-
     const handleExportExcel = () => {
-        const exportData = filteredRows.map(row => ({
+        const exportData = payments.map(row => ({
             'ID': row.paymentId,
             'Monto': row.amount,
             'Referencia': row.reference,
@@ -108,6 +96,22 @@ export default function Dashboard() {
         XLSX.utils.book_append_sheet(wb, ws, "Pagos");
         XLSX.writeFile(wb, `pagos_${new Date().toISOString().split('T')[0]}.xlsx`);
     };
+
+    if (loading) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    if (error) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                <Typography color="error">Error: {error}</Typography>
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -146,6 +150,7 @@ export default function Dashboard() {
                     <Button
                         variant="outlined"
                         color="success"
+                        disabled={totalElements === 0}
                         onClick={handleExportExcel}
                         startIcon={<TableRows />}
                         sx={{ height: '40px', whiteSpace: 'nowrap' }}
@@ -158,6 +163,7 @@ export default function Dashboard() {
                     placeholder="Buscar..."
                     variant="outlined"
                     size="small"
+                    disabled={totalElements === 0}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     sx={{
@@ -188,20 +194,21 @@ export default function Dashboard() {
             </Collapse>
 
             <LazyPaymentsTable
-                filteredRows={filteredRows}
-                page={page}
-                rowsPerPage={rowsPerPage}
-                onPageChange={(event, newPage) => setPage(newPage)}
+                data={payments}
+                page={currentPage}
+                rowsPerPage={pageSize}
+                totalItems={totalElements}
+                onPageChange={(event, newPage) => dispatch(setPage(newPage))}
                 onRowsPerPageChange={(event) => {
-                    setRowsPerPage(parseInt(event.target.value, 10));
-                    setPage(0);
+                    dispatch(setPageSize(parseInt(event.target.value, 10)));
+                    dispatch(setPage(0));
                 }}
-                onCancelClick={(row) => {
-                    setSelectedRow(row);
+                onCancelClick={(row: PaymentRow) => {
+                    dispatch(setSelectedPayment(row));
                     setOpenCancelForm(true);
                 }}
-                onViewDetails={(row) => {
-                    setSelectedRow(row);
+                onViewDetails={(row: PaymentRow) => {
+                    dispatch(setSelectedPayment(row));
                     setOpenModal(true);
                 }}
             />
@@ -218,13 +225,13 @@ export default function Dashboard() {
                 formType="cancel"
                 onClose={() => setOpenCancelForm(false)}
                 onSubmit={handleCancelSubmit}
-                selectedRow={selectedRow}
+                selectedRow={selectedPayment}
             />
 
             <LazyModalInformation 
                 isOpen={openModal} 
                 onClose={() => setOpenModal(false)} 
-                row={selectedRow} 
+                row={selectedPayment} 
             />
         </Box>
     );
