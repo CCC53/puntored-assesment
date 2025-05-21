@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 import { Chart, registerables } from 'chart.js';
-import { Box, Paper, Typography, Grid, Card, CardContent, useTheme } from '@mui/material';
+import { Box, Paper, Typography, Card, CardContent, useTheme } from '@mui/material';
 import { PaymentStatsChartProps } from '@/app/types/components.types';
 
 Chart.register(...registerables);
@@ -124,9 +124,16 @@ export default function PaymentStatsChart({ stats }: PaymentStatsChartProps) {
                 Estadísticas de Pagos
             </Typography>
 
-            <Grid container spacing={3} sx={{ mb: 4 }}>
+            <Box sx={{ 
+                display: 'flex', 
+                flexWrap: 'wrap', 
+                gap: 3, 
+                mb: 4 
+            }}>
                 {Object.entries(stats).map(([status, count]) => (
-                    <Grid item xs={12} sm={6} md={3} key={status}>
+                    <Box key={status} sx={{ 
+                        width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(25% - 18px)' }
+                    }}>
                         <Card 
                             elevation={3}
                             sx={{ 
@@ -168,9 +175,9 @@ export default function PaymentStatsChart({ stats }: PaymentStatsChartProps) {
                                 </Typography>
                             </CardContent>
                         </Card>
-                    </Grid>
+                    </Box>
                 ))}
-            </Grid>
+            </Box>
 
             <Paper 
                 elevation={3} 
