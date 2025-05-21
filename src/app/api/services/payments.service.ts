@@ -49,7 +49,7 @@ export class PaymentsService {
                 startPaymentDate: startPaymentDate ? moment(startPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null,
                 endPaymentDate: endPaymentDate ? moment(endPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null
             }
-            const filtered = Object.entries(filters).filter(([_, value]) => value !== null);
+            const filtered = Object.entries(filters).filter(([, value]) => value !== null);
             const concatedFilters = filtered.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
             const response = await apiClient.get<SearchPaymentsResponse>(`${ENDPOINTS.REFERENCES.SEARCH}?${concatedFilters}`);
             return response;
@@ -69,7 +69,7 @@ export class PaymentsService {
                     startPaymentDate: startPaymentDate ? moment(startPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null,
                     endPaymentDate: endPaymentDate ? moment(endPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null
                 }
-                const filtered = Object.entries(filters).filter(([_, value]) => value !== null);
+                const filtered = Object.entries(filters).filter(([, value]) => value !== null);
                 const concatedFilters = filtered.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
                 response[this.statusesLabel[index]] = (await apiClient.get<SearchPaymentsResponse>(`${ENDPOINTS.REFERENCES.SEARCH}?${concatedFilters}`)).data.page.totalElements;
             }
