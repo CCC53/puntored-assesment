@@ -6,9 +6,12 @@ import * as XLSX from 'xlsx';
 import { Filters, STATUS_MAP } from "@/app/types/components.types";
 import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "@/app/components/LazyComponents";
 import { useDispatch, useSelector } from "react-redux";
-import { searchPayments, setPage, setPageSize, setSelectedPayment } from "@/app/redux/payments.slice";
+import { cancelPaymentAndRefresh, searchPayments, setPage, setPageSize, setSelectedPayment } from "@/app/redux/payments.slice";
 import { AppDispatch, RootState } from "@/app/redux/store";
-import { PaymentRow } from "@/app/types/payments.types";
+import { CancelPaymentBody, GeneratePaymentBody, PaymentRow, ValidPaymentStatus } from "@/app/types/payments.types";
+import { CancelPaymentAndRefreshBody } from "@/app/types/form.types";
+import moment from 'moment';
+import { PaymentsService } from "../api/services/payments.service";
 
 export default function Dashboard() {
     const dispatch = useDispatch<AppDispatch>();
@@ -19,6 +22,7 @@ export default function Dashboard() {
     const [openCancelForm, setOpenCancelForm] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
+    const [reference, setReference] = useState<string | undefined>();
     const [filters, setFilters] = useState<Filters>({
         startCreationDate: null,
         endCreationDate: null,
@@ -47,12 +51,28 @@ export default function Dashboard() {
     }, [dispatch, filters]);
 
     async function handlePaymentSubmit<T>(data: Record<string, T>) {
-        console.log('Payment form data:', data);
-        setOpenPaymentForm(false);
+        try {
+            const body: GeneratePaymentBody = {
+                externalId: data.externalId as string,
+                amount: Number(data.amount),
+                description: data.description as string,
+                dueDate: moment(data.dueDate as Date).format('YYYY-MM-DD HH:mm:ss'),
+                callbackURL: "https://localhost:8080/callback"
+            }
+            const response = await PaymentsService.generatePayment(body);
+            if (response) {
+                setReference(response.data.reference);
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     async function handleCancelSubmit<T>(data: Record<string, T>) {
-        console.log('Cancel form data:', data);
+        data.status = ValidPaymentStatus.CANCELED as T;
+        const body = data as unknown as CancelPaymentBody;
+        const reqBody = { body, filters } as CancelPaymentAndRefreshBody;
+        dispatch(cancelPaymentAndRefresh(reqBody));
         setOpenCancelForm(false);
     }
 
@@ -219,6 +239,8 @@ export default function Dashboard() {
                 formType="payment"
                 onClose={() => setOpenPaymentForm(false)}
                 onSubmit={handlePaymentSubmit}
+                reference={reference}
+                setReference={() => setReference(undefined)}
             />
 
             <LazyDynamicForm

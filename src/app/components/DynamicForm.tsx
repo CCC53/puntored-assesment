@@ -1,13 +1,19 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack, DialogActions } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DialogProps, FieldConfig } from "@/app/types/components.types";
 import { cancelFields, paymentFields } from "@/app/types/fields.types";
+import { LazyCopyBlock } from "./LazyComponents";
+import { Typography } from "@mui/material";
 
-export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow }: DialogProps<T>) {
+type FormValue = string | number | Date | null;
+type FormValues = Record<string, FormValue>;
+
+export default function DynamicForm({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow, reference, setReference }: DialogProps<FormValue>) {
     const fields = formType === 'payment' ? paymentFields : cancelFields;
+    const [showConfirmation, setShowConfirmation] = useState(false);
 
-    const [formState, setFormState] = useState<{ values: Record<string, any>; errors: Record<string, string>; touched: Record<string, boolean>; }>({
+    const [formState, setFormState] = useState<{ values: FormValues; errors: Record<string, string>; touched: Record<string, boolean>; }>({
         values: fields.reduce((acc, field) => ({
             ...acc,
             [field.name]: field.type === 'date' ? null : ''
@@ -25,9 +31,10 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
             errors: {},
             touched: {}
         });
+        setShowConfirmation(false);
     };
 
-    function validateField<T>(field: FieldConfig<T>, value: T) {
+    function validateField(field: FieldConfig<FormValue>, value: FormValue) {
         if (field.required && !value) {
             return `${field.label} es requerido`;
         }
@@ -37,12 +44,22 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
         return '';
     }
 
-    function handleChange<T>(field: FieldConfig<T>, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | null, dateValue?: Date | null) {
-        const value = field.type === 'date' ? dateValue : event?.target.value;
+    function handleChange(field: FieldConfig<FormValue>, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | null, dateValue?: Date | null) {
+        let value: FormValue;
+        if (field.type === 'date') {
+            value = dateValue ?? null;
+        } else {
+            value = event?.target.value ?? '';
+        }
+
+        if (field.name === 'dueDate' && value instanceof Date) {
+            value = new Date(value);
+            value.setHours(23, 59, 0, 0);
+        }
 
         setFormState(prev => {
             const newValues = { ...prev.values, [field.name]: value };
-            const error = prev.touched[field.name] ? validateField(field, value as T) : '';
+            const error = prev.touched[field.name] ? validateField(field, value) : '';
 
             return {
                 ...prev,
@@ -52,7 +69,7 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
         });
     }
 
-    function handleBlur<T>(field: FieldConfig<T>) {
+    function handleBlur(field: FieldConfig<FormValue>) {
         setFormState(prev => ({
             ...prev,
             touched: { ...prev.touched, [field.name]: true },
@@ -68,14 +85,36 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
         return !allErrors.some(error => error !== '');
     };
 
+    const handleOnClose = () => {
+        if (onClose) {            
+            if (formType === 'payment' && setReference) {
+                setReference();
+            }
+            onClose();
+        }
+        resetForm();
+    }
+
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        if (formType === 'cancel') {
+            setShowConfirmation(true);
+            return;
+        }
+        await submitForm();
+    };
+
+    const submitForm = async () => {
         try {
             if (onSubmit) {
                 await onSubmit(formState.values);
-                resetForm();
+                if (formType === 'cancel') {
+                    resetForm();
+                }
             }
-            if (onClose) onClose();
+            if (onClose && formType === "cancel") {
+                onClose();
+            }
         } catch (error) {
             console.log(error);
             setFormState(prev => ({
@@ -85,13 +124,13 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
         }
     };
 
-    function renderField<T>(field: FieldConfig<T>) {
+    function renderField(field: FieldConfig<FormValue>) {
         if (field.type === 'date') {
             return (
                 <DatePicker
                     key={field.name}
                     label={field.label}
-                    value={formState.values[field.name]}
+                    value={formState.values[field.name] as Date | null}
                     onChange={(newValue) => handleChange(field, null, newValue)}
                     onClose={() => handleBlur(field)}
                     slotProps={{
@@ -112,8 +151,8 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
                 label={field.label}
                 type={field.type === 'disabled' ? 'text' : field.type}
                 placeholder={field.placeholder}
-                value={formState.values[field.name]}
-                onChange={() => handleChange(field, null)}
+                value={formState.values[field.name] as string}
+                onChange={(event) => handleChange(field, event)}
                 onBlur={() => handleBlur(field)}
                 error={formState.touched[field.name] && Boolean(formState.errors[field.name])}
                 helperText={formState.touched[field.name] && formState.errors[field.name]}
@@ -131,7 +170,7 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
         if (!isOpen) {
             resetForm();
         }
-    }, [isOpen, resetForm]);
+    }, [isOpen]);
 
     useEffect(() => {
         if (isOpen && formType === 'cancel' && selectedRow?.reference) {
@@ -143,31 +182,63 @@ export default function DynamicForm<T>({ isOpen, formType = 'payment', onClose, 
     }, [formType, isOpen, selectedRow]);
 
     return (
-        <Dialog maxWidth="sm" fullWidth open={isOpen} 
-            onClose={() => {
-                resetForm();
-                if (onClose) onClose();
-            }}
-        >
-            <DialogTitle>
-                {formType === 'payment' ? 'Crear Nuevo Pago' : 'Cancelar Pago'}
-            </DialogTitle>
-            <DialogContent>
-                <Box component="form" onSubmit={handleSubmit} noValidate>
-                    <Stack spacing={3} sx={{ mt: 2 }}>
-                        {fields.map(renderField)}
-                        {formState.errors.general && (
-                            <Box color="error.main">{formState.errors.general}</Box>
-                        )}
-                        <Stack direction="row" spacing={2} justifyContent="flex-end">
-                            <Button onClick={onClose}>Cancelar</Button>
-                            <Button type="submit" variant="contained" color="primary" disabled={!isFormValid()}>
-                                {formType === 'payment' ? 'Crear Pago' : 'Confirmar Cancelación'}
-                            </Button>
+        <>
+            <Dialog maxWidth="sm" fullWidth open={isOpen} 
+                onClose={() => {
+                    resetForm();
+                    if (onClose) onClose();
+                }}
+            >
+                <DialogTitle>
+                    {formType === 'payment' ? reference ? 'Pago' : 'Crear Nuevo Pago' : 'Cancelar Pago'}
+                </DialogTitle>
+                <DialogContent>
+                    <Box component="form" onSubmit={handleSubmit} noValidate>
+                        <Stack spacing={3} sx={{ mt: 2 }}>
+                            {fields.map(renderField)}
+                            {
+                                reference && <LazyCopyBlock text={reference}/>
+                            }
+                            {formState.errors.general && (
+                                <Box color="error.main">{formState.errors.general}</Box>
+                            )}
+                            <Stack direction="row" spacing={2} justifyContent="flex-end">
+                                <Button onClick={handleOnClose}>Cancelar</Button>
+                                <Button type="submit" variant="contained" color="primary" disabled={!isFormValid() || reference !== undefined}>
+                                    {formType === 'payment' ? 'Crear Pago' : 'Confirmar Cancelación'}
+                                </Button>
+                            </Stack>
                         </Stack>
-                    </Stack>
-                </Box>
-            </DialogContent>
-        </Dialog>
+                    </Box>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog
+                open={showConfirmation}
+                onClose={() => setShowConfirmation(false)}
+                maxWidth="xs"
+                fullWidth
+            >
+                <DialogTitle>Confirmar Cancelación</DialogTitle>
+                <DialogContent>
+                    <Typography>
+                        ¿Está seguro que desea cancelar este pago? Esta acción no se puede deshacer.
+                    </Typography>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setShowConfirmation(false)}>No, Cancelar</Button>
+                    <Button 
+                        onClick={() => {
+                            setShowConfirmation(false);
+                            submitForm();
+                        }} 
+                        variant="contained" 
+                        color="error"
+                    >
+                        Sí, Confirmar Cancelación
+                    </Button>
+                </DialogActions>
+            </Dialog>
+        </>
     );
 }

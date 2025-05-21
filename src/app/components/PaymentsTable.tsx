@@ -2,6 +2,7 @@ import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconB
 import { Cancel, Info, Preview } from "@mui/icons-material";
 import { LazyChipStatus } from "./LazyComponents";
 import { PaymentsTableProps } from "@/app/types/components.types";
+import moment from 'moment';
 
 export default function PaymentsTable({
     data,
@@ -78,7 +79,7 @@ export default function PaymentsTable({
                                             <TableCell sx={{ whiteSpace: 'nowrap', fontSize: '1rem' }}>{row.amount}</TableCell>
                                             <TableCell sx={{ whiteSpace: 'nowrap', fontSize: '1rem' }}>{row.reference}</TableCell>
                                             <TableCell sx={{ whiteSpace: 'nowrap', fontSize: '1rem' }}>{row.description}</TableCell>
-                                            <TableCell sx={{ whiteSpace: 'nowrap', fontSize: '1rem' }}>{new Date(row.dueDate).toLocaleString()}</TableCell>
+                                            <TableCell sx={{ whiteSpace: 'nowrap', fontSize: '1rem' }}>{moment(row.dueDate).format("DD/MM/YYYY")}</TableCell>
                                             <TableCell align="center" sx={{ whiteSpace: 'nowrap', fontSize: '1rem' }}>
                                                 <LazyChipStatus value={row.status} />
                                             </TableCell>

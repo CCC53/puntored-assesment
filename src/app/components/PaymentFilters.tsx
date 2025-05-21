@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { DatePicker } from '@mui/x-date-pickers';
 import { differenceInDays } from 'date-fns';
-import { Box, Paper, Stack, Typography, FormControl, InputLabel, Select, MenuItem, useTheme } from "@mui/material";
+import { Box, Paper, Stack, Typography, FormControl, InputLabel, Select, MenuItem, useTheme, Button } from "@mui/material";
 import { PaymentFiltersProps, STATUS_OPTIONS } from "@/app/types/components.types";
+import ClearIcon from '@mui/icons-material/Clear';
 
 export default function PaymentFilters({ filters, onFilterChange, type }: PaymentFiltersProps) {
     const theme = useTheme();
@@ -59,6 +60,22 @@ export default function PaymentFilters({ filters, onFilterChange, type }: Paymen
         } else {
             setDateErrors(prev => ({ ...prev, [field]: errorMessage }));
         }
+    };
+
+    const handleClearFilters = () => {
+        onFilterChange('startCreationDate')(null);
+        onFilterChange('endCreationDate')(null);
+        onFilterChange('startPaymentDate')(null);
+        onFilterChange('endPaymentDate')(null);
+        if (type === 'table') {
+            onFilterChange('status')('');
+        }
+        setDateErrors({
+            startCreationDate: '',
+            endCreationDate: '',
+            startPaymentDate: '',
+            endPaymentDate: ''
+        });
     };
 
     return (
@@ -166,6 +183,17 @@ export default function PaymentFilters({ filters, onFilterChange, type }: Paymen
                     )
                 }
             </Stack>
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    startIcon={<ClearIcon />}
+                    onClick={handleClearFilters}
+                    sx={{ mt: 2 }}
+                >
+                    Limpiar filtros
+                </Button>
+            </Box>
         </Paper>
     );
 } 

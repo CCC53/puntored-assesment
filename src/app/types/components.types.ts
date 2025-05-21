@@ -12,7 +12,7 @@ export interface ChipStatusProps {
 }
 
 export interface CopyBlockProps {
-  text: string;
+    text: string;
 }
 
 export interface FieldConfig<T> {
@@ -36,6 +36,8 @@ export interface DialogProps<T> {
     onClose?: () => void;
     onSubmit?: (data: Record<string, T>) => Promise<void>;
     selectedRow: PaymentRow | null;
+    reference?: string;
+    setReference?: () => void;
 }
 
 export interface Filters {
@@ -43,6 +45,14 @@ export interface Filters {
     endCreationDate: Date | null;
     startPaymentDate: Date | null;
     endPaymentDate: Date | null;
+    status: string;
+}
+
+export interface FiltersMapped {
+    startCreationDate: string | null;
+    endCreationDate: string | null;
+    startPaymentDate: string | null;
+    endPaymentDate: string | null;
     status: string;
 }
 

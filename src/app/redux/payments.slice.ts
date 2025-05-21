@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { StoreData } from "@/app/types/store.types";
 import { PaymentsService } from "@/app/api/services/payments.service";
 import { Filters } from "@/app//types/components.types";
+import { CancelPaymentAndRefreshBody } from "@/app/types/form.types";
 
 const initialState: StoreData = {
     payments: [],
@@ -31,7 +32,16 @@ export const countPaymentsForStats = createAsyncThunk('payments/countPaymentsFor
     } catch (error) {
         return rejectWithValue(error);
     }
-})
+});
+
+export const cancelPaymentAndRefresh = createAsyncThunk('payments/cancelPaymentAndRefresh', async (body: CancelPaymentAndRefreshBody, { rejectWithValue }) => {
+    try {
+        const response = await PaymentsService.cancelPayment(body);
+        return response;
+    } catch (error) {
+        return rejectWithValue(error);
+    }
+});
 
 export const paymentSlice = createSlice({
     name: 'payments',
@@ -81,6 +91,24 @@ export const paymentSlice = createSlice({
                 }
             })
             .addCase(countPaymentsForStats.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+            })
+            .addCase(cancelPaymentAndRefresh.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(cancelPaymentAndRefresh.fulfilled, (state, action) => {
+                state.loading = false;
+                if (action.payload) {
+                    state.payments = action.payload.data.content;
+                    state.totalElements = action.payload.data.page.totalElements;
+                    state.totalPages = action.payload.data.page.totalPages;
+                    state.currentPage = action.payload.data.page.number;
+                    state.pageSize = action.payload.data.page.size;
+                }
+            })
+            .addCase(cancelPaymentAndRefresh.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
             })
