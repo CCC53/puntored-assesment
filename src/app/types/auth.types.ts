@@ -21,3 +21,7 @@ export interface AuthError {
         }
     }
 }
+
+export interface JWTPayload {
+    exp?: number;
+}

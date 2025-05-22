@@ -83,3 +83,8 @@ export interface SearchPaymentsResponse {
         }
     }
 }
+
+export interface GetPaymentBodyForAction {
+    reference: string;
+    id: number;
+}

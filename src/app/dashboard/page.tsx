@@ -1,17 +1,18 @@
 "use client";
 import { useEffect, useState } from "react";
+import moment from 'moment';
+import { useDispatch, useSelector } from "react-redux";
 import { Box, useTheme, TextField, InputAdornment, Button, Stack, Collapse, CircularProgress, Typography } from "@mui/material";
 import { Search, Add, FilterList, TableRows } from "@mui/icons-material";
 import * as XLSX from 'xlsx';
-import { Filters, STATUS_MAP } from "@/app/types/components.types";
-import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "@/app/components/LazyComponents";
-import { useDispatch, useSelector } from "react-redux";
-import { cancelPaymentAndRefresh, searchPayments, setPage, setPageSize, setSelectedPayment } from "@/app/redux/payments.slice";
 import { AppDispatch, RootState } from "@/app/redux/store";
+import { showSuccessToast, showErrorToast } from "@/app/utils/toast";
+import { LazyDynamicForm, LazyModalInformation, LazyPaymentsTable, LazyPaymentFilters } from "@/app/components/LazyComponents";
+import { cancelPaymentAndRefresh, getPaymentForDetails, searchPayments, setPage, setPageSize } from "@/app/redux/payments.slice";
 import { CancelPaymentBody, GeneratePaymentBody, PaymentRow, ValidPaymentStatus } from "@/app/types/payments.types";
 import { CancelPaymentAndRefreshBody } from "@/app/types/form.types";
-import moment from 'moment';
-import { PaymentsService } from "../api/services/payments.service";
+import { Filters, STATUS_MAP } from "@/app/types/components.types";
+import { PaymentsService } from "@/app/api/services/payments.service";
 
 export default function Dashboard() {
     const dispatch = useDispatch<AppDispatch>();
@@ -21,6 +22,7 @@ export default function Dashboard() {
     const [openPaymentForm, setOpenPaymentForm] = useState(false);
     const [openCancelForm, setOpenCancelForm] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    const [filteredPayments, setFilteredPayments] = useState<PaymentRow[]>([]);
     const [showFilters, setShowFilters] = useState(false);
     const [reference, setReference] = useState<string | undefined>();
     const [filters, setFilters] = useState<Filters>({
@@ -50,6 +52,19 @@ export default function Dashboard() {
         }
     }, [dispatch, filters]);
 
+    useEffect(() => {
+        if (searchQuery.trim() === '') {
+            setFilteredPayments(payments);
+        } else {
+            const query = searchQuery.toLowerCase();
+            const filtered = payments.filter(payment => 
+                payment.reference.toLowerCase().includes(query) ||
+                payment.description.toLowerCase().includes(query)
+            );
+            setFilteredPayments(filtered);
+        }
+    }, [searchQuery, payments]);
+
     async function handlePaymentSubmit<T>(data: Record<string, T>) {
         try {
             const body: GeneratePaymentBody = {
@@ -62,9 +77,11 @@ export default function Dashboard() {
             const response = await PaymentsService.generatePayment(body);
             if (response) {
                 setReference(response.data.reference);
+                showSuccessToast("Pago creado con éxito");
             }
         } catch (error) {
-            console.log(error)
+            console.log(error);
+            showErrorToast("Error al crear el pago");
         }
     }
 
@@ -179,14 +196,14 @@ export default function Dashboard() {
                 </Stack>
 
                 <TextField
-                    placeholder="Buscar..."
+                    placeholder="Buscar por referencia o descripción..."
                     variant="outlined"
                     size="small"
                     disabled={totalElements === 0}
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     sx={{
-                        minWidth: { xs: '100%', sm: '300px' },
+                        minWidth: { xs: '100%', sm: '400px', md: '500px' },
                         backgroundColor: 'white',
                         '& .MuiOutlinedInput-root': {
                             height: '40px',
@@ -214,21 +231,29 @@ export default function Dashboard() {
             </Collapse>
 
             <LazyPaymentsTable
-                data={payments}
+                data={filteredPayments}
                 page={currentPage}
                 rowsPerPage={pageSize}
-                totalItems={totalElements}
-                onPageChange={(event, newPage) => dispatch(setPage(newPage))}
+                totalItems={filteredPayments.length}
+                onPageChange={(event, newPage) => {
+                    dispatch(setPage(newPage));
+                    if (hasValidFilters(filters)) {
+                        dispatch(searchPayments(filters));
+                    }
+                }}
                 onRowsPerPageChange={(event) => {
                     dispatch(setPageSize(parseInt(event.target.value, 10)));
                     dispatch(setPage(0));
+                    if (hasValidFilters(filters)) {
+                        dispatch(searchPayments(filters));
+                    }
                 }}
                 onCancelClick={(row: PaymentRow) => {
-                    dispatch(setSelectedPayment(row));
+                    dispatch(getPaymentForDetails({ reference: row.reference, id: row.paymentId }));
                     setOpenCancelForm(true);
                 }}
                 onViewDetails={(row: PaymentRow) => {
-                    dispatch(setSelectedPayment(row));
+                    dispatch(getPaymentForDetails({ reference: row.reference, id: row.paymentId }));
                     setOpenModal(true);
                 }}
             />

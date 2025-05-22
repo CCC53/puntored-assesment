@@ -8,7 +8,6 @@ import Box from '@mui/material/Box';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import theme from './theme';
 import { store } from './redux/store';
-import { LoadingOverlay } from './components/LoadingOverlay';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -33,7 +32,6 @@ export default function Providers({ children }: ProvidersProps) {
                 <ThemeProvider theme={theme}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <CssBaseline />
-                        <LoadingOverlay />
                         {children}
                         <ToastContainer
                             position="top-right"

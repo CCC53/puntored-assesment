@@ -1,10 +1,10 @@
 'use client';
 
 import { useSelector } from 'react-redux';
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Box, CircularProgress } from '@mui/material';
 import { RootState } from '../redux/store';
 
-export const LoadingOverlay = () => {
+export default function LoadingOverlay() {
     const { loading } = useSelector((state: RootState) => state.payments);
 
     if (!loading) return null;
@@ -26,16 +26,6 @@ export const LoadingOverlay = () => {
             }}
         >
             <CircularProgress size={60} thickness={4} />
-            <Typography
-                variant="h6"
-                sx={{
-                    color: 'white',
-                    mt: 2,
-                    textAlign: 'center',
-                }}
-            >
-                Cargando...
-            </Typography>
         </Box>
     );
 }; 

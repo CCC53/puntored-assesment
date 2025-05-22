@@ -1,6 +1,6 @@
 import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableFooter, TablePagination, Paper, useTheme, useMediaQuery, Box, Typography } from '@mui/material';
 import { Cancel, Info, Preview } from "@mui/icons-material";
-import { LazyChipStatus } from "./LazyComponents";
+import { LazyChipStatus, LazyNoDataInfo } from "./LazyComponents";
 import { PaymentsTableProps } from "@/app/types/components.types";
 import moment from 'moment';
 
@@ -21,28 +21,7 @@ export default function PaymentsTable({
         <Paper sx={{ width: '100%', mb: 2, borderRadius: 2 }}>
             {
                 data.length === 0 ? (
-                    <Box sx={{
-                        width: '100%',
-                        maxWidth: { xs: '100%', sm: 650 },
-                        display: 'flex',
-                        justifyContent: 'center',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        px: 2,
-                        py: 2,
-                        mx: 'auto',
-                    }}>
-                        <Typography sx={{
-                            fontSize: { xs: '1.2rem', sm: '1.6rem' },
-                            fontWeight: 700,
-                            color: 'primary.main',
-                            textAlign: 'center',
-                            width: '100%'
-                        }}>
-                            No hay pagos registrados
-                        </Typography>
-                        <Info sx={{ fontSize: { xs: '2rem', sm: '2.5rem' } }} color='primary' />
-                    </Box>
+                    <LazyNoDataInfo message='No hay pagos registrados'/>
                 ) : (
                     <TableContainer sx={{ maxHeight: 'calc(100vh - 300px)', overflow: 'auto' }}>
                         <Table stickyHeader sx={{ minWidth: 650 }} aria-label="payments table">

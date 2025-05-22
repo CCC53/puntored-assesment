@@ -1,15 +1,17 @@
 "use client"; 
 import { useState, Suspense } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
 import { useTheme } from '@mui/material';
 import dynamic from 'next/dynamic';
-import { AuthService } from '../api/services/auth.service';
-import { ErrorHandler } from '../api/utils/errorHandler';
-import { FormValues, FormErrors } from '../types/form.types';
-import styles from './page.module.css';
 import { AxiosError } from 'axios';
+import { AuthService } from '@/app/api/services/auth.service';
+import { ErrorHandler } from '@/app/api/utils/errorHandler';
+import { FormErrors } from '@/app/types/form.types';
+import { LoginCredentials } from '@/app/types/auth.types';
+import styles from './page.module.css';
 
 const TextField = dynamic(() => import('@mui/material/TextField'), { ssr: false });
 const Button = dynamic(() => import('@mui/material/Button'), { ssr: false });
@@ -26,7 +28,8 @@ const FormBox = dynamic(() => import('@mui/material/Box'), {
 export default function Login() {
     const theme = useTheme();
     const [loading, setLoading] = useState(false);
-    const [values, setValues] = useState<FormValues>({
+    const router = useRouter();
+    const [values, setValues] = useState<LoginCredentials>({
         username: '',
         password: ''
     });
@@ -64,7 +67,7 @@ export default function Login() {
         return '';
     };
 
-    const handleChange = (field: keyof FormValues) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleChange = (field: keyof LoginCredentials) => (event: React.ChangeEvent<HTMLInputElement>) => {
         const value = event.target.value;
         setValues(prev => ({
             ...prev,
@@ -79,7 +82,7 @@ export default function Login() {
         }
     };
 
-    const handleBlur = (field: keyof FormValues) => () => {
+    const handleBlur = (field: keyof LoginCredentials) => () => {
         setTouched(prev => ({
             ...prev,
             [field]: true
@@ -108,9 +111,9 @@ export default function Login() {
         event.preventDefault();
         setLoading(true);
         try {
-            const response = await AuthService.login({ username: values.username, password: values.password });
+            const response = await AuthService.login({ username: values.username, password: values.password }, router);
             console.log(response)
-            window.location.href = '/dashboard';
+            router.push('/dashboard');
         } catch (error) {
             const apiError = ErrorHandler.handle(error as AxiosError);
             setErrors(prev => ({

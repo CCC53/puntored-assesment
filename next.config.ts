@@ -10,11 +10,11 @@ const nextConfig: NextConfig = {
   async rewrites() {
     return [
       {
-        source: '/api/authenticate',
+        source: '/authenticate',
         destination: `${API_BASE_URL}/authenticate`,
       },
       {
-        source: '/api/payment/:path*',
+        source: '/payment/:path*',
         destination: `${API_BASE_URL}/payment/:path*`,
       },
     ];
@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
-        source: "/api/:path*",
+        source: "/:path*",
         headers: [
           { key: "Access-Control-Allow-Credentials", value: "true" },
           { key: "Access-Control-Allow-Origin", value: "*" },

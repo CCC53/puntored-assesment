@@ -59,7 +59,7 @@ export class PaymentsService {
         }
     }
 
-    public static async getPayment(reference: string, paymentId: string) {
+    public static async getPayment(reference: string, paymentId: number) {
         try {
             const response = await apiClient.get<GetPaymentResponse>(`${ENDPOINTS.REFERENCES.CORE}/${reference}/${paymentId}`);
             return response;
@@ -68,14 +68,16 @@ export class PaymentsService {
         }
     }
 
-    public static async searchPayments({ status, startCreationDate, endCreationDate, startPaymentDate, endPaymentDate }: Filters) {
+    public static async searchPayments({ status, startCreationDate, endCreationDate, startPaymentDate, endPaymentDate, page = 0, paginate = 10 }: Filters) {
         try {
             const filters: FiltersMapped = {
                 status,
                 startCreationDate: startCreationDate ? moment(startCreationDate).format('YYYY-MM-DD HH:mm:ss') : null,
                 endCreationDate: endCreationDate ? moment(endCreationDate).format('YYYY-MM-DD HH:mm:ss') : null,
                 startPaymentDate: startPaymentDate ? moment(startPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null,
-                endPaymentDate: endPaymentDate ? moment(endPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null
+                endPaymentDate: endPaymentDate ? moment(endPaymentDate).format('YYYY-MM-DD HH:mm:ss') : null,
+                page,
+                paginate
             }
             const filtered = Object.entries(filters).filter(([, value]) => value !== null);
             const concatedFilters = filtered.map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');

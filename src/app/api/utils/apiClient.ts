@@ -25,7 +25,7 @@ class ApiClient {
     private setupInterceptors(): void {
         this.axiosInstance.interceptors.request.use(
             (config) => {
-                const token = localStorage.getItem('auth_token');
+                const token = localStorage.getItem('accessToken');
                 if (token) {
                     config.headers.Authorization = `Bearer ${token}`;
                 }
@@ -40,7 +40,7 @@ class ApiClient {
             (response) => response,
             async (error: AxiosError) => {
                 if (error.response?.status === 401) {
-                    localStorage.removeItem('auth_token');
+                    localStorage.removeItem('accessToken');
                     window.location.href = '/login';
                 }
                 return Promise.reject(error);

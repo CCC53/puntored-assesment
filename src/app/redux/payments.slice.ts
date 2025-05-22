@@ -1,10 +1,11 @@
+import { AxiosError } from "axios";
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { StoreData } from "@/app/types/store.types";
 import { PaymentsService } from "@/app/api/services/payments.service";
 import { Filters } from "@/app//types/components.types";
+import { StoreData } from "@/app/types/store.types";
 import { CancelPaymentAndRefreshBody } from "@/app/types/form.types";
 import { showSuccessToast, showErrorToast } from "@/app/utils/toast";
-import { AxiosError } from "axios";
+import { GetPaymentBodyForAction } from "@/app/types/payments.types";
 
 const initialState: StoreData = {
     payments: [],
@@ -28,9 +29,12 @@ const handleError = (error: unknown): string => {
     return 'Se ha producido un error inesperado';
 };
 
-export const searchPayments = createAsyncThunk('payments/searchPayments', async (filters: Filters, { rejectWithValue }) => {
+export const searchPayments = createAsyncThunk('payments/searchPayments', async (filters: Filters, { getState, rejectWithValue }) => {
     try {
-        const response = await PaymentsService.searchPayments(filters);
+        const state = getState() as { payments: StoreData };
+        const { currentPage, pageSize } = state.payments;
+        const response = await PaymentsService.searchPayments({ ...filters, page: currentPage, paginate: pageSize });
+        showSuccessToast('Pagos obtenidos con éxito');
         return response;
     } catch (error) {
         return rejectWithValue(handleError(error));
@@ -40,6 +44,7 @@ export const searchPayments = createAsyncThunk('payments/searchPayments', async 
 export const countPaymentsForStats = createAsyncThunk('payments/countPaymentsForStats', async (filters: Filters, { rejectWithValue }) => {
     try {
         const response = await PaymentsService.countPaymentsForStats(filters);
+        showSuccessToast('Estadísticas obtenidas con éxito');
         return response;
     } catch (error) {
         return rejectWithValue(handleError(error));
@@ -49,20 +54,27 @@ export const countPaymentsForStats = createAsyncThunk('payments/countPaymentsFor
 export const cancelPaymentAndRefresh = createAsyncThunk('payments/cancelPaymentAndRefresh', async (body: CancelPaymentAndRefreshBody, { rejectWithValue }) => {
     try {
         const response = await PaymentsService.cancelPayment(body);
-        showSuccessToast('Payment canceled successfully');
+        showSuccessToast('Pago cancelado con éxito');
         return response;
     } catch (error) {
         return rejectWithValue(handleError(error));
     }
 });
 
+export const getPaymentForDetails = createAsyncThunk('payments/getPaymentForDetails', async ({ reference, id }: GetPaymentBodyForAction, { rejectWithValue }) => {
+    try {
+        const response = await PaymentsService.getPayment(reference, id);
+        showSuccessToast('Pago obtenido con éxito');
+        return response;
+    } catch (error) {
+        return rejectWithValue(handleError(error));
+    }
+})
+
 export const paymentSlice = createSlice({
     name: 'payments',
     initialState,
     reducers: {
-        setSelectedPayment: (state, action) => {
-            state.selectedPayment = action.payload;
-        },
         clearSelectedPayment: (state) => {
             state.selectedPayment = null;
         },
@@ -128,8 +140,23 @@ export const paymentSlice = createSlice({
                 state.error = action.payload as string;
                 showErrorToast(action.payload as string);
             })
+            .addCase(getPaymentForDetails.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getPaymentForDetails.fulfilled, (state, action) => {
+                state.loading = false;
+                if (action.payload) {
+                    state.selectedPayment = action.payload.data;
+                }
+            })
+            .addCase(getPaymentForDetails.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload as string;
+                showErrorToast(action.payload as string);
+            })
     }
 });
 
-export const { setSelectedPayment, clearSelectedPayment, setPage, setPageSize } = paymentSlice.actions;
+export const { clearSelectedPayment, setPage, setPageSize } = paymentSlice.actions;
 export default paymentSlice.reducer;

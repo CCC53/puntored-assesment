@@ -8,6 +8,7 @@ import styles from './dashboard.module.css';
 import { AuthService } from '../api/services/auth.service';
 import { CircularProgress } from '@mui/material';
 import Box from '@mui/material/Box';
+import { useRedirect } from '../hooks/useRedirect';
 
 const MenuIcon = dynamic(() => import('@mui/icons-material/Menu'), { ssr: false });
 const DashboardIcon = dynamic(() => import('@mui/icons-material/Dashboard'), { ssr: false });
@@ -56,6 +57,8 @@ export default function DashboardLayout({
         router.push(path);
         setOpen(false);
     };
+
+    useRedirect();
 
     return (
         <Box>
@@ -149,8 +152,7 @@ export default function DashboardLayout({
                             variant='contained'
                             className={styles.logout}
                             onClick={() => {
-                                AuthService.logout();
-                                router.push('/login');
+                                AuthService.logout(router);
                             }}
                             startIcon={<LogoutIcon className={styles.logoutIcon} />}
                         >

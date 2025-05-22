@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack, DialogActions, CircularProgress } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
+import { Typography } from "@mui/material";
 import { DialogProps, FieldConfig } from "@/app/types/components.types";
 import { cancelFields, paymentFields } from "@/app/types/fields.types";
+import { FormValue, FormValues } from "@/app/types/form.types";
 import { LazyCopyBlock } from "./LazyComponents";
-import { Typography } from "@mui/material";
-
-type FormValue = string | number | Date | null;
-type FormValues = Record<string, FormValue>;
 
 export default function DynamicForm({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow, reference, setReference }: DialogProps<FormValue>) {
     const fields = formType === 'payment' ? paymentFields : cancelFields;

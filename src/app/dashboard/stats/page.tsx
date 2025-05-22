@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FilterList } from "@mui/icons-material";
-import { Box, Button, Stack, Collapse } from "@mui/material";
+import { FilterList, Info } from "@mui/icons-material";
+import { Box, Button, Stack, Collapse, Typography } from "@mui/material";
 import { Filters } from "@/app/types/components.types";
-import { LazyPaymentFilters, LazyPaymentStatsChart } from "@/app/components/LazyComponents";
+import { LazyNoDataInfo, LazyPaymentFilters, LazyPaymentStatsChart } from "@/app/components/LazyComponents";
 import { AppDispatch, RootState } from "@/app/redux/store";
 import { countPaymentsForStats } from "@/app/redux/payments.slice";
 
@@ -85,7 +85,7 @@ export default function Dashboard() {
                     type="stats"
                 />
             </Collapse>
-            {hasValidFilters(filters) && <LazyPaymentStatsChart stats={totalPayments} />}
+            {hasValidFilters(filters) ? <LazyPaymentStatsChart stats={totalPayments} /> : <LazyNoDataInfo message="No hay estadísticas por mostrar"/>}
         </Box>
     );
 }

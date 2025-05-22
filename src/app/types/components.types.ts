@@ -46,6 +46,8 @@ export interface Filters {
     startPaymentDate: Date | null;
     endPaymentDate: Date | null;
     status: string;
+    page?: number;
+    paginate?: number
 }
 
 export interface FiltersMapped {
@@ -54,6 +56,8 @@ export interface FiltersMapped {
     startPaymentDate: string | null;
     endPaymentDate: string | null;
     status: string;
+    page?: number;
+    paginate?: number;
 }
 
 export const STATUS_MAP = {
@@ -97,4 +101,7 @@ export interface InfoRowProps {
 
 export interface PaymentStatsChartProps {
     stats: Record<string, number>;
+}
+export interface NoDataInfoProps {
+    message: string;
 }

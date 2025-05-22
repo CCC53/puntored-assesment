@@ -7,12 +7,10 @@ export interface FormErrors {
     general?: string;
 }
 
-export interface FormValues {
-    username: string;
-    password: string;
-}
-
 export interface CancelPaymentAndRefreshBody {
     body: CancelPaymentBody;
     filters: Filters;
 }
+
+export type FormValue = string | number | Date | null;
+export type FormValues = Record<string, FormValue>;

@@ -4,6 +4,7 @@ import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typog
 import CloseIcon from '@mui/icons-material/Close';
 import { LazyChipStatus, LazyInfoRow } from "./LazyComponents";
 import { ModalInformationProps } from "@/app/types/components.types";
+import moment from "moment";
 
 export default function ModalInformation({ isOpen, onClose, row }: ModalInformationProps) {
     const theme = useTheme();
@@ -138,12 +139,16 @@ export default function ModalInformation({ isOpen, onClose, row }: ModalInformat
 
                                     <LazyInfoRow label="Fecha de vencimiento">
                                         <Typography sx={{ fontSize: { xs: '0.85rem', sm: '0.9rem' }, lineHeight: 1.5, color: 'text.primary', fontWeight: 500 }}>
-                                            {new Date(row.dueDate).toLocaleString()}
+                                            {moment(row.dueDate).format('DD/MM/YYYY HH:mm')}
                                         </Typography>
                                     </LazyInfoRow>
 
                                     <LazyInfoRow label="Estado">
                                         <LazyChipStatus value={row.status} />
+                                    </LazyInfoRow>
+
+                                    <LazyInfoRow label="Número de autorización">
+                                        {row.authorizationNumber}
                                     </LazyInfoRow>
 
                                     <LazyInfoRow label="Motivo de cancelación">
