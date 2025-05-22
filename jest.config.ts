@@ -19,7 +19,7 @@ const config: Config = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testEnvironment: "jsdom",
   testMatch: [
-    "**/__tests__/unit/**/*.[jt]s?(x)",
+    "**/__tests__/**/*.[jt]s?(x)",
   ],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1'

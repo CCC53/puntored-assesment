@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { ThemeProvider, createTheme } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -9,16 +9,28 @@ const theme = createTheme();
 
 type FilterFields = 'startCreationDate' | 'endCreationDate' | 'startPaymentDate' | 'endPaymentDate' | 'status';
 
-const mockFilters = {
-    startCreationDate: null as Date | null,
-    endCreationDate: null as Date | null,
-    startPaymentDate: null as Date | null,
-    endPaymentDate: null as Date | null,
+interface FilterValues {
+    startCreationDate: Date | null;
+    endCreationDate: Date | null;
+    startPaymentDate: Date | null;
+    endPaymentDate: Date | null;
+    status: string;
+}
+
+const mockFilters: FilterValues = {
+    startCreationDate: null,
+    endCreationDate: null,
+    startPaymentDate: null,
+    endPaymentDate: null,
     status: ''
 };
 
 const mockOnFilterChange = jest.fn().mockImplementation((field: FilterFields) => (value: Date | null | string) => {
-    (mockFilters as any)[field] = value;
+    if (field === 'status') {
+        mockFilters[field] = value as string;
+    } else {
+        mockFilters[field] = value as Date | null;
+    }
 });
 
 const renderWithProviders = (ui: React.ReactElement) => {
