@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://sandbox-v1.portalventas.net/v1';
+
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
@@ -9,11 +11,11 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/authenticate',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/authenticate`,
+        destination: `${API_BASE_URL}/authenticate`,
       },
       {
         source: '/api/payment/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE_URL}/payment/:path*`,
+        destination: `${API_BASE_URL}/payment/:path*`,
       },
     ];
   },
