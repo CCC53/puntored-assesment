@@ -37,7 +37,7 @@ export default function CopyBlock({ text }: CopyBlockProps) {
           sx={{ position: 'absolute', top: 8, right: 8 }}
           aria-label="Copy to clipboard"
         >
-          {copied ? <CheckIcon color="success" /> : <ContentCopyIcon />}
+          {copied ? <CheckIcon data-testid="CheckIcon" color="success" /> : <ContentCopyIcon data-testid="ContentCopyIcon" />}
         </IconButton>
       </Tooltip>
     </Box>

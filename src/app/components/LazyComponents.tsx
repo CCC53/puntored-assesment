@@ -9,5 +9,4 @@ export const LazyPaymentsTable = dynamic(() => import('./PaymentsTable'), { ssr:
 export const LazyDynamicForm = dynamic(() => import('./DynamicForm'), { ssr: false });
 export const LazyCopyBlock = dynamic(() => import('./CopyBlock'), { ssr: false }); 
 export const LazyPaymentStatsChart = dynamic(() => import('./PaymentStatsChart'), { ssr: false });
-export const LazyLoadingOverlay = dynamic(() => import('./LoadingOverlay'), { ssr: true });
 export const LazyNoDataInfo = dynamic(() => import('./NoDataInfo'), { ssr: true });
