@@ -148,7 +148,7 @@ export default function ModalInformation({ isOpen, onClose, row }: ModalInformat
                                     </LazyInfoRow>
 
                                     <LazyInfoRow label="Número de autorización">
-                                        {row.authorizationNumber}
+                                        {row.authorizationNumber || "N/A"}
                                     </LazyInfoRow>
 
                                     <LazyInfoRow label="Motivo de cancelación">
