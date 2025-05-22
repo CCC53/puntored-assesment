@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# puntored Payment Management System FrontEnd Assesment
 
-## Getting Started
+## Descripción del Proyecto
+Este proyecto es un sistema de gestión de pagos desarrollado con Next.js y TypeScript. Permite a los usuarios realizar las siguientes operaciones:
 
-First, run the development server:
+- Generar nuevos pagos
+- Buscar pagos existentes por referencia o descripción
+- Filtrar pagos por fecha de creación, fecha de pago y estado
+- Cancelar pagos
+- Exportar datos a Excel
+- Visualizar detalles de pagos
+- Paginación de resultados
 
+El sistema utiliza una arquitectura moderna con:
+- Next.js 14 para el frontend
+- Redux Toolkit para el manejo del estado
+- Material-UI para la interfaz de usuario
+- TypeScript para type safety
+- Moment.js para el manejo de fechas
+- XLSX para la exportación a Excel
+
+## Pasos para Configurar y Ejecutar el Proyecto
+
+### Prerrequisitos
+- Node.js (versión 18 o superior)
+- npm o yarn
+
+### Instalación
+
+1. Clonar el repositorio:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone [URL_DEL_REPOSITORIO]
+cd puntored-assesment
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Instalar dependencias:
+```bash
+npm install
+# o
+yarn install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Configurar variables de entorno:
+Crear un archivo `.env.local` en la raíz del proyecto con las siguientes variables:
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8080
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Iniciar el servidor de desarrollo:
+```bash
+npm run dev
+# o
+yarn dev
+```
 
-## Learn More
+5. Abrir el navegador:
+El proyecto estará disponible en `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+### Scripts Disponibles
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` - Inicia el servidor de desarrollo
+- `npm run build` - Construye la aplicación para producción
+- `npm run start` - Inicia la aplicación en modo producción
+- `npm run lint` - Ejecuta el linter
+- `npm run test` - Ejecuta las pruebas
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Estructura del Proyecto
 
-## Deploy on Vercel
+```
+src/
+├── app/
+│   ├── api/           # Servicios y configuraciones de API
+│   ├── components/    # Componentes reutilizables
+│   ├── dashboard/     # Página principal del dashboard
+│   ├── redux/         # Estado global con Redux
+│   ├── types/         # Definiciones de tipos TypeScript
+│   └── utils/         # Utilidades y helpers
+├── public/            # Archivos estáticos
+└── styles/           # Estilos globales
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Características Principales
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Búsqueda en Tiempo Real**: Filtrado instantáneo de pagos por referencia o descripción
+- **Filtros Avanzados**: Filtrado por fechas y estados
+- **Paginación**: Navegación eficiente a través de grandes conjuntos de datos
+- **Exportación**: Exportación de datos a Excel
+- **Gestión de Pagos**: Creación y cancelación de pagos
+- **Interfaz Responsiva**: Diseño adaptable a diferentes tamaños de pantalla
+
+### Tecnologías Utilizadas
+
+- Next.js 14
+- TypeScript
+- Redux Toolkit
+- Material-UI
+- Moment.js
+- XLSX
+- React Query (para manejo de estado del servidor)

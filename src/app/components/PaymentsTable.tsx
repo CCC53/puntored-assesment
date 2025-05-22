@@ -1,8 +1,8 @@
-import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableFooter, TablePagination, Paper, useTheme, useMediaQuery, Box, Typography } from '@mui/material';
-import { Cancel, Info, Preview } from "@mui/icons-material";
+import moment from 'moment';
+import { TableContainer, Table, TableHead, TableRow, TableCell, TableBody, IconButton, TableFooter, TablePagination, Paper, useTheme, useMediaQuery } from '@mui/material';
+import { Cancel, Preview } from "@mui/icons-material";
 import { LazyChipStatus, LazyNoDataInfo } from "./LazyComponents";
 import { PaymentsTableProps } from "@/app/types/components.types";
-import moment from 'moment';
 
 export default function PaymentsTable({
     data,

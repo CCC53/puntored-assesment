@@ -1,8 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FilterList, Info } from "@mui/icons-material";
-import { Box, Button, Stack, Collapse, Typography } from "@mui/material";
+import { FilterList } from "@mui/icons-material";
+import { Box, Button, Stack, Collapse } from "@mui/material";
 import { Filters } from "@/app/types/components.types";
 import { LazyNoDataInfo, LazyPaymentFilters, LazyPaymentStatsChart } from "@/app/components/LazyComponents";
 import { AppDispatch, RootState } from "@/app/redux/store";
