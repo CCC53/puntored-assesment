@@ -25,6 +25,7 @@ const FormBox = dynamic(() => import('@mui/material/Box'), {
 
 export default function Login() {
     const theme = useTheme();
+    const [loading, setLoading] = useState(false);
     const [values, setValues] = useState<FormValues>({
         username: '',
         password: ''
@@ -105,6 +106,7 @@ export default function Login() {
 
     const handleSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
+        setLoading(true);
         try {
             const response = await AuthService.login({ username: values.username, password: values.password });
             console.log(response)
@@ -115,6 +117,8 @@ export default function Login() {
                 ...prev,
                 general: apiError.message
             }));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -206,6 +210,7 @@ export default function Login() {
                         <Button
                             variant="contained"
                             type="submit"
+                            loading={loading}
                             disabled={!isFormValid()}
                             fullWidth
                             sx={{

@@ -189,8 +189,8 @@ export default function DashboardLayout({
                 <Box
                     sx={{
                         mt: 'auto',
-                        py: 6,
-                        px: 6,
+                        py: { xs: 1.5, sm: 2 },
+                        px: { xs: 2, sm: 3 },
                         backgroundColor: 'white',
                         borderTop: '1px solid rgba(0, 0, 0, 0.12)',
                         position: 'fixed',
@@ -201,25 +201,39 @@ export default function DashboardLayout({
                         flexDirection: { xs: 'column', sm: 'row' },
                         alignItems: 'center',
                         justifyContent: 'space-between',
-                        gap: 4,
-                        role: 'contentinfo'
+                        gap: { xs: 1, sm: 2 },
+                        role: 'contentinfo',
+                        height: { xs: 'auto', sm: '60px' },
+                        minHeight: { xs: '60px', sm: '60px' }
                     }}
                 >
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box sx={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: 1,
+                        width: { xs: '100%', sm: 'auto' },
+                        justifyContent: { xs: 'center', sm: 'flex-start' }
+                    }}>
                         <Image
                             src="https://www.bancamia.com.co/wp-content/uploads/2024/10/logo-punto-red-negro-comprimida.png"
                             alt="Logo"
-                            width={100}
-                            height={50}
+                            width={80}
+                            height={40}
                             style={{ objectFit: 'contain' }}
                         />
                         <Box sx={{ 
-                            borderLeft: '2px solid rgba(0, 0, 0, 0.12)', 
-                            height: 40, 
+                            borderLeft: '1px solid rgba(0, 0, 0, 0.12)', 
+                            height: 24, 
                             display: { xs: 'none', sm: 'block' } 
                         }} />
                     </Box>
-                    <Box>
+                    <Box sx={{ 
+                        fontSize: '0.875rem', 
+                        color: 'text.secondary',
+                        width: { xs: '100%', sm: 'auto' },
+                        textAlign: { xs: 'center', sm: 'left' },
+                        mt: { xs: 0.5, sm: 0 }
+                    }}>
                         &copy; {new Date().getFullYear()} Carlos Calette.
                     </Box>
                 </Box>

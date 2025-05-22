@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack, DialogActions } from "@mui/material";
+import { Dialog, DialogContent, DialogTitle, TextField, Button, Box, Stack, DialogActions, CircularProgress } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
 import { DialogProps, FieldConfig } from "@/app/types/components.types";
 import { cancelFields, paymentFields } from "@/app/types/fields.types";
@@ -12,6 +12,7 @@ type FormValues = Record<string, FormValue>;
 export default function DynamicForm({ isOpen, formType = 'payment', onClose, onSubmit, selectedRow, reference, setReference }: DialogProps<FormValue>) {
     const fields = formType === 'payment' ? paymentFields : cancelFields;
     const [showConfirmation, setShowConfirmation] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const [formState, setFormState] = useState<{ values: FormValues; errors: Record<string, string>; touched: Record<string, boolean>; }>({
         values: fields.reduce((acc, field) => ({
@@ -32,6 +33,7 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
             touched: {}
         });
         setShowConfirmation(false);
+        setIsSubmitting(false);
     };
 
     function validateField(field: FieldConfig<FormValue>, value: FormValue) {
@@ -86,7 +88,7 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
     };
 
     const handleOnClose = () => {
-        if (onClose) {            
+        if (onClose) {
             if (formType === 'payment' && setReference) {
                 setReference();
             }
@@ -106,6 +108,9 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
 
     const submitForm = async () => {
         try {
+            if (formType === 'payment') {
+                setIsSubmitting(true);
+            }
             if (onSubmit) {
                 await onSubmit(formState.values);
                 if (formType === 'cancel') {
@@ -121,6 +126,10 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 ...prev,
                 errors: { ...prev.errors, general: 'Error al procesar la solicitud. Por favor, intente nuevamente.' }
             }));
+        } finally {
+            if (formType === 'payment') {
+                setIsSubmitting(false);
+            }
         }
     };
 
@@ -183,7 +192,7 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
 
     return (
         <>
-            <Dialog maxWidth="sm" fullWidth open={isOpen} 
+            <Dialog maxWidth="sm" fullWidth open={isOpen}
                 onClose={() => {
                     resetForm();
                     if (onClose) onClose();
@@ -197,14 +206,20 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                         <Stack spacing={3} sx={{ mt: 2 }}>
                             {fields.map(renderField)}
                             {
-                                reference && <LazyCopyBlock text={reference}/>
+                                reference && <LazyCopyBlock text={reference} />
                             }
                             {formState.errors.general && (
                                 <Box color="error.main">{formState.errors.general}</Box>
                             )}
                             <Stack direction="row" spacing={2} justifyContent="flex-end">
                                 <Button onClick={handleOnClose}>Cancelar</Button>
-                                <Button type="submit" variant="contained" color="primary" disabled={!isFormValid() || reference !== undefined}>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="primary"
+                                    disabled={!isFormValid() || reference !== undefined || (formType === 'payment' && isSubmitting)}
+                                    startIcon={formType === 'payment' && isSubmitting ? <CircularProgress size={20} color="inherit" /> : undefined}
+                                >
                                     {formType === 'payment' ? 'Crear Pago' : 'Confirmar Cancelación'}
                                 </Button>
                             </Stack>
@@ -227,12 +242,12 @@ export default function DynamicForm({ isOpen, formType = 'payment', onClose, onS
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setShowConfirmation(false)}>No, Cancelar</Button>
-                    <Button 
+                    <Button
                         onClick={() => {
                             setShowConfirmation(false);
                             submitForm();
-                        }} 
-                        variant="contained" 
+                        }}
+                        variant="contained"
                         color="error"
                     >
                         Sí, Confirmar Cancelación

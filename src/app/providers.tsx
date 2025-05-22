@@ -8,6 +8,9 @@ import Box from '@mui/material/Box';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import theme from './theme';
 import { store } from './redux/store';
+import { LoadingOverlay } from './components/LoadingOverlay';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ThemeProvider = dynamic(() => import('@mui/material/styles').then(mod => mod.ThemeProvider), { ssr: false });
 const LocalizationProvider = dynamic(() => import('@mui/x-date-pickers').then(mod => mod.LocalizationProvider), { ssr: false });
@@ -30,7 +33,20 @@ export default function Providers({ children }: ProvidersProps) {
                 <ThemeProvider theme={theme}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <CssBaseline />
+                        <LoadingOverlay />
                         {children}
+                        <ToastContainer
+                            position="top-right"
+                            autoClose={3000}
+                            hideProgressBar={false}
+                            newestOnTop
+                            closeOnClick
+                            rtl={false}
+                            pauseOnFocusLoss
+                            draggable
+                            pauseOnHover
+                            theme="light"
+                        />
                     </LocalizationProvider>
                 </ThemeProvider>
             </Provider>

@@ -3,6 +3,8 @@ import { StoreData } from "@/app/types/store.types";
 import { PaymentsService } from "@/app/api/services/payments.service";
 import { Filters } from "@/app//types/components.types";
 import { CancelPaymentAndRefreshBody } from "@/app/types/form.types";
+import { showSuccessToast, showErrorToast } from "@/app/utils/toast";
+import { AxiosError } from "axios";
 
 const initialState: StoreData = {
     payments: [],
@@ -16,12 +18,22 @@ const initialState: StoreData = {
     totalPayments: {}
 }
 
+const handleError = (error: unknown): string => {
+    if (error instanceof AxiosError) {
+        return error.response?.data?.responseMessage || error.message || 'Se ha producido un error';
+    }
+    if (error instanceof Error) {
+        return error.message;
+    }
+    return 'Se ha producido un error inesperado';
+};
+
 export const searchPayments = createAsyncThunk('payments/searchPayments', async (filters: Filters, { rejectWithValue }) => {
     try {
         const response = await PaymentsService.searchPayments(filters);
         return response;
     } catch (error) {
-        return rejectWithValue(error);
+        return rejectWithValue(handleError(error));
     }
 });
 
@@ -30,16 +42,17 @@ export const countPaymentsForStats = createAsyncThunk('payments/countPaymentsFor
         const response = await PaymentsService.countPaymentsForStats(filters);
         return response;
     } catch (error) {
-        return rejectWithValue(error);
+        return rejectWithValue(handleError(error));
     }
 });
 
 export const cancelPaymentAndRefresh = createAsyncThunk('payments/cancelPaymentAndRefresh', async (body: CancelPaymentAndRefreshBody, { rejectWithValue }) => {
     try {
         const response = await PaymentsService.cancelPayment(body);
+        showSuccessToast('Payment canceled successfully');
         return response;
     } catch (error) {
-        return rejectWithValue(error);
+        return rejectWithValue(handleError(error));
     }
 });
 
@@ -79,6 +92,7 @@ export const paymentSlice = createSlice({
             .addCase(searchPayments.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+                showErrorToast(action.payload as string);
             })
             .addCase(countPaymentsForStats.pending, state => {
                 state.loading = true;
@@ -93,6 +107,7 @@ export const paymentSlice = createSlice({
             .addCase(countPaymentsForStats.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+                showErrorToast(action.payload as string);
             })
             .addCase(cancelPaymentAndRefresh.pending, (state) => {
                 state.loading = true;
@@ -111,6 +126,7 @@ export const paymentSlice = createSlice({
             .addCase(cancelPaymentAndRefresh.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload as string;
+                showErrorToast(action.payload as string);
             })
     }
 });

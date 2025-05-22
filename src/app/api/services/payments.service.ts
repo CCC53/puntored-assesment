@@ -4,19 +4,47 @@ import { CancelPaymentResponse, GeneratePaymentBody, GeneratePaymentResponse, Ge
 import { Filters, FiltersMapped } from '@/app/types/components.types';
 import { CancelPaymentAndRefreshBody } from '@/app/types/form.types';
 import moment from 'moment';
+import { AxiosError } from 'axios';
 
 export class PaymentsService {
 
     private static statuses = [ValidPaymentStatus.CREATED, ValidPaymentStatus.PAID, ValidPaymentStatus.CANCELED, ValidPaymentStatus.EXPIRED];
     private static statusesLabel = ['Creado', 'Pagado', 'Cancelado', 'Expirado']
 
+    private static handleError(error: unknown) {
+        if (error instanceof AxiosError) {
+            const status = error.response?.status;
+            const message = error.response?.data.responseMessage || 'Error';
+            if (status && status >= 400 && status < 500) {
+                switch (status) {
+                    case 400:
+                        throw new Error(`Bad Request: ${message}`);
+                    case 401:
+                        throw new Error(`Unauthorized: ${message}`);
+                    case 403:
+                        throw new Error(`Forbidden: ${message}`);
+                    case 404:
+                        throw new Error(`Not Found: ${message}`);
+                    case 409:
+                        throw new Error(`Conflict: ${message}`);
+                    default:
+                        throw new Error(`Client Error: ${message}`);
+                }
+            }
+
+            if (error.response?.data.responseCode === 500) {
+                throw new Error('Internal server error');
+            }
+        }
+        throw error;
+    }
 
     public static async generatePayment(data: GeneratePaymentBody) {
         try {
             const response = await apiClient.post<GeneratePaymentResponse>(ENDPOINTS.REFERENCES.CORE, data);
             return response;
         } catch (error) {
-            console.log(error);
+            this.handleError(error);
         }
     }
 
@@ -27,7 +55,7 @@ export class PaymentsService {
             const response = await this.searchPayments(filters);
             return response;
         } catch (error) {
-            console.log(error);
+            this.handleError(error);
         }
     }
 
@@ -36,7 +64,7 @@ export class PaymentsService {
             const response = await apiClient.get<GetPaymentResponse>(`${ENDPOINTS.REFERENCES.CORE}/${reference}/${paymentId}`);
             return response;
         } catch (error) {
-            console.log(error);
+            this.handleError(error);
         }
     }
 
@@ -54,7 +82,7 @@ export class PaymentsService {
             const response = await apiClient.get<SearchPaymentsResponse>(`${ENDPOINTS.REFERENCES.SEARCH}?${concatedFilters}`);
             return response;
         } catch (error) {
-            console.log(error);
+            this.handleError(error);
         }
     }
 
@@ -75,7 +103,7 @@ export class PaymentsService {
             }
             return response;
         } catch (error) {
-            console.log(error);
+            this.handleError(error);
         }
     }
 }
